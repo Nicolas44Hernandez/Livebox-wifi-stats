@@ -1,0 +1,100 @@
+version: 1
+disable_existing_loggers: true
+
+formatters:
+  default:
+    format: "%(asctime)s [%(threadName)s] [%(levelname)s] %(name)s: %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+
+  main:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/main.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  generate_random_files:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/generate_ramdom_files.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  static_data:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/static_data.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  files_transfer:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/files_transfer.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  info_stations:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/info_stations.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  swich_band:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/swich_band.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+  chanim_stats:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nicolas/workspace/stage_telnet/wifi_stats/logs/chanim_stats.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+root:
+  level: WARN
+  handlers: [console]
+
+loggers:
+  main:
+    level: DEBUG
+    handlers: [main]
+    propagate: no
+
+  programs.chanim_stats:
+    level: DEBUG
+    handlers: [chanim_stats]
+    propagate: no
+
+  programs.files_transfer:
+    level: DEBUG
+    handlers: [files_transfer]
+    propagate: no
+
+  programs.generate_random_files:
+    level: DEBUG
+    handlers: [generate_random_files]
+    propagate: no
+
+  programs.info_connected_stations:
+    level: DEBUG
+    handlers: [info_stations]
+    propagate: no
+
+  programs.static_data:
+    level: DEBUG
+    handlers: [static_data]
+    propagate: no
+
+  programs.switch_5GHz:
+    level: DEBUG
+    handlers: [swich_band]
+    propagate: no
