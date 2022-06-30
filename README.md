@@ -9,7 +9,7 @@ TODO:
 * ADD timestamp to results directory
 * add instal PyYaml to readme
 * ADD methods doc
-* Add usb drive name as config param (ex: dev-sda1)
+* double check logs
 
 ## SCRIPT: CHANIM STATS
 

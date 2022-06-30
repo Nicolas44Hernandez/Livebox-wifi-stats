@@ -18,7 +18,7 @@ from programs.generate_random_files import run_generate_random_files
 HOST = "192.168.1.1"
 USER = 'root'
 PASSWORD = "sah"
-USB_DEVICE = "/var/usbmount/kernel::dev-sdb1/"
+USB_DEVICE_PATH = "/var/usbmount/kernel::"
 RESULTS_DIR = "wifi_stats_results"
 
 PROGRAMS = {
@@ -46,6 +46,7 @@ def main():
         -fc     --files_transfer_config    Config file for files transfer program
         -d      --duration                 Analysis duration
         -lc     --logs_config              Logs configuration
+        -rd     --results_disk             External USB disk for analysis results
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
@@ -112,6 +113,13 @@ def main():
         help="Logs config",
     )
 
+    parser.add_argument(
+        "-rd",
+        "--results_disk",
+        type=str,
+        help="External USB disk for analysis results",
+    )
+
     # Parse args
     args = parser.parse_args()
 
@@ -137,7 +145,8 @@ def main():
         return
 
     # Create results dir
-    results_dir = telnet.create_results_dir(device=USB_DEVICE, results_directory=RESULTS_DIR, box_name = args.name)
+    device = f"/var/usbmount/kernel::{args.results_disk}/"
+    results_dir = telnet.create_results_dir(device=device, results_directory=RESULTS_DIR, box_name = args.name)
 
     # Run program
     if args.program in PROGRAMS:
