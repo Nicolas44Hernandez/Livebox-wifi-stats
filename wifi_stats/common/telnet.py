@@ -3,7 +3,7 @@ import telnetlib
 import socket
 import logging
 import time
-from datetime import date
+from datetime import date, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -67,24 +67,20 @@ class Telnet:
 
     def create_results_dir(self, device: str, results_directory: str, box_name: str):
         """Create a clean dir for telnet results, if directory exists files will be overwritten"""
-        # create wifi stats results dir if doesnt exists
+        timestamp=str(int(datetime.now().timestamp()))
         box_directory = results_directory + "/" + box_name
-        today_results_directory = box_directory + "/" + str(date.today())
+        analysis_results_directory = box_directory + "/" + str(date.today()) + "-" + timestamp
         create_dir_command = "mkdir " + device + results_directory + "\n"
         create_box_dir_command = "mkdir " + device + box_directory + "\n"
-        create_today_dir_command = "mkdir " + device + today_results_directory + "\n"
-        clean_dir_command = "rm -f -r "  + device + today_results_directory + "/*\n"
+        create_analysis_dir_command = "mkdir " + device + analysis_results_directory + "\n"
         try:
             self.connection.write(create_dir_command.encode("ascii"))
             time.sleep(self.time_between_commands)
             self.connection.write(create_box_dir_command.encode("ascii"))
             time.sleep(self.time_between_commands)
-            self.connection.write(create_today_dir_command.encode("ascii"))
-            time.sleep(self.time_between_commands)
-            self.connection.write(clean_dir_command.encode("ascii"))
+            self.connection.write(create_analysis_dir_command.encode("ascii"))
             time.sleep(self.time_between_commands)
         except (socket.timeout, socket.error):
             logger.error("Error in telnet connection")
             return None
-
-        return device + today_results_directory
+        return device + analysis_results_directory

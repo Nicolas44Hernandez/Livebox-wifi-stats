@@ -6,7 +6,7 @@ TODO:
 
 - [ ] README.md
 - [ ] Functions doc
-- [ ] ADD timestamp to results directory
+- [X] ADD timestamp to results directory
 - [ ] add instal PyYaml to readme
 - [ ] add install sshpas to readme file
 - [ ] ADD methods doc
@@ -18,7 +18,7 @@ TODO:
 
 TODO:
 
-- [ ] Add station timestamp as new column
+- [ ] Add master station timestamp as new column
 - [ ] Manage main loop with absolut time
 
 ## SCRIPT: STATIC_DATA
