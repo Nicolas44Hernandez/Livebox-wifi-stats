@@ -19,7 +19,7 @@ TODO:
 TODO:
 
 - [ ] Add master station timestamp as new column
-- [ ] Manage main loop with absolut time
+- [X] Manage main loop with absolut time
 
 ## SCRIPT: STATIC_DATA
 
@@ -37,7 +37,7 @@ TODO:
 - [ ] Show connection number results file as table
 - [ ] Show single station info as a table
 - [ ] One file by mac address
-- [ ] Manage main loop with absolut time
+- [X] Manage main loop with absolut time
 - [ ] Check error in stations result file
 
 ## SCRIPT SWITCH_5GHz

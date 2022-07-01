@@ -30,6 +30,7 @@ def main():
         -f      --files_path               Random files path
         -fc     --files_transfer_config    Config file for files transfer program
         -d      --duration                 Analysis duration
+        -sp     --sampling_period_in_secs  Sampling period for information request
         -on     --on_period_in_secs        5GHz band ON period in secs
         -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
@@ -85,12 +86,17 @@ def main():
         type=str,
         help="Config file for files transfer program",
     )
-
     parser.add_argument(
         "-d",
         "--duration",
         type=int,
         help="Analysis duration in minutes",
+    )
+    parser.add_argument(
+        "-sp",
+        "--sampling_period_in_secs",
+        type=int,
+        help="Sampling period for information request",
     )
     parser.add_argument(
         "-on",
@@ -161,25 +167,20 @@ def main():
             off_period_in_secs=args.off_period_in_secs,
         )
         return
-    if args.program == "stations":
-        run_info_connected_stations(
-            telnet=telnet,
-            results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration
-        )
-        return
     if args.program == "chanim_stats":
         run_chanim_stats(
             telnet=telnet,
             results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration
+            analysis_duration_in_minutes=args.duration,
+            sampling_period_in_seconds=args.sampling_period_in_secs
         )
         return
     if args.program == "stations":
         run_info_connected_stations(
             telnet=telnet,
             results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration
+            analysis_duration_in_minutes=args.duration,
+            sampling_period_in_seconds=args.sampling_period_in_secs
         )
         return
 

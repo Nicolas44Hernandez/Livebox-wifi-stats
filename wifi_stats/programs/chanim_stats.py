@@ -20,10 +20,12 @@ COMMANDS = {
     "get stats 5GHz": 'export stats=$(wl -i wl0 chanim_stats | tail -1); date -Iseconds | (echo -n -e "$stats \t"  && cat)'
 }
 
-# Time period between each loop stats
-SLEEP_TIME_BETWEEN_LOOPS=1
-
-def run_chanim_stats(telnet: Telnet, results_dir:str,  analysis_duration_in_minutes: int):
+def run_chanim_stats(
+    telnet: Telnet,
+    results_dir:str,
+    analysis_duration_in_minutes: int,
+    sampling_period_in_seconds: int
+):
     logger.info("RUNNING PROGRAM: chanim stats")
     start = datetime.now()
     estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
@@ -45,8 +47,12 @@ def run_chanim_stats(telnet: Telnet, results_dir:str,  analysis_duration_in_minu
     # Waiting loop
     now = datetime.now()
     while now < estimated_end:
+        next_sample_at = now + timedelta(seconds=sampling_period_in_seconds)
         telnet.send_command(get_stats_2G_command)
         telnet.send_command(get_stats_5G_command)
-        time.sleep(SLEEP_TIME_BETWEEN_LOOPS)
         now = datetime.now()
+
+        while now < next_sample_at:
+            time.sleep(0.1)
+            now = datetime.now()
 
