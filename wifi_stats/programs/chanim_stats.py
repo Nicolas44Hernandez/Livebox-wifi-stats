@@ -23,11 +23,10 @@ COMMANDS = {
 # Time period between each loop stats
 SLEEP_TIME_BETWEEN_LOOPS=1
 
-def run_chanim_stats(telnet: Telnet, results_dir:str,  duration_in_minutes: int):
+def run_chanim_stats(telnet: Telnet, results_dir:str,  analysis_duration_in_minutes: int):
     logger.info("RUNNING PROGRAM: chanim stats")
-
     start = datetime.now()
-    estimated_end = start + timedelta(minutes=duration_in_minutes)
+    estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
     output_redirection_2g_command = " >> " + results_dir + "/" + RESULTS_FILE_2G

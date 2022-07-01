@@ -50,7 +50,7 @@ def write_livebox_infos(telnet: Telnet, results_dir:str):
    write_broadcom_version_command = "wl ver" + " >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_broadcom_version_command)
 
-def run_static_data(telnet: Telnet, results_dir:str, duration_in_minutes: int):
+def run_static_data(telnet: Telnet, results_dir:str):
    logger.info("RUNNING PROGRAM: static data")
 
    # write master stations infos

@@ -128,10 +128,10 @@ def get_test_params(config_file: str):
     return stations_dict, files_path
 
 
-def run_files_transfer(config_file: str, duration_in_minutes: int):
+def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
     logger.info("RUNNING PROGRAM: files transfer")
     start = datetime.now()
-    estimated_end = start + timedelta(minutes=duration_in_minutes)
+    estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
     stations_dict, files_path = get_test_params(config_file=config_file)
@@ -141,7 +141,7 @@ def run_files_transfer(config_file: str, duration_in_minutes: int):
     for station in stations_dict:
         file_sender = FilesSender(
             interval=station["send_interval"],
-            duration=duration_in_minutes,
+            duration=analysis_duration_in_minutes,
             function=send_file_to_station,
             args=(station, files_path),
         )

@@ -12,24 +12,9 @@ from programs.switch_5GHz import run_switch_5GHz
 from programs.files_transfer import run_files_transfer
 from programs.generate_random_files import run_generate_random_files
 
-
-
-# Connection params
-HOST = "192.168.1.1"
-USER = 'root'
-PASSWORD = "sah"
 USB_DEVICE_PATH = "/var/usbmount/kernel::"
 RESULTS_DIR = "wifi_stats_results"
 
-PROGRAMS = {
-    "chanim_stats": run_chanim_stats,
-    "static_livebox_data": run_static_data,
-    "stations": run_info_connected_stations,
-    "switch_5GHz": run_switch_5GHz,
-    "files_transfer": run_files_transfer,
-}
-
-logging.basicConfig(format='%(asctime)s [%(threadName)s] [%(levelname)s] %(name)s: %(message)s', level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +30,8 @@ def main():
         -f      --files_path               Random files path
         -fc     --files_transfer_config    Config file for files transfer program
         -d      --duration                 Analysis duration
+        -on     --on_period_in_secs        5GHz band ON period in secs
+        -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
         -rd     --results_disk             External USB disk for analysis results
     """
@@ -105,6 +92,18 @@ def main():
         type=int,
         help="Analysis duration in minutes",
     )
+    parser.add_argument(
+        "-on",
+        "--on_period_in_secs",
+        type=int,
+        help="5GHz band ON period in secs",
+    )
+    parser.add_argument(
+        "-off",
+        "--off_period_in_secs",
+        type=int,
+        help="5GHz band ON period in secs",
+    )
 
     parser.add_argument(
         "-lc",
@@ -130,14 +129,12 @@ def main():
     logger.info(f"Running program: {args.program}")
     logger.info(f"args: {args}")
 
-    # Only for generate random files
+    # Programs that dont need telnet connection
     if args.program == "generate_random_files":
         run_generate_random_files(files_path=args.files_path)
         return
-
-     # Only for files_transfer
     if args.program == "files_transfer":
-        run_files_transfer(config_file=args.files_transfer_config, duration_in_minutes=args.duration)
+        run_files_transfer(config_file=args.files_transfer_config, analysis_duration_in_minutes=args.duration)
         return
 
     # Create telnet connection
@@ -152,8 +149,39 @@ def main():
     results_dir = telnet.create_results_dir(device=device, results_directory=RESULTS_DIR, box_name = args.name)
 
     # Run program
-    if args.program in PROGRAMS:
-        PROGRAMS[args.program](telnet=telnet, results_dir=results_dir, duration_in_minutes=args.duration)
+    if args.program == "static_livebox_data":
+        run_static_data(telnet=telnet, results_dir=results_dir)
+        return
+    if args.program == "switch_5GHz":
+        run_switch_5GHz(
+            telnet=telnet,
+            results_dir=results_dir,
+            analysis_duration_in_minutes=args.duration,
+            on_period_in_secs=args.on_period_in_secs,
+            off_period_in_secs=args.off_period_in_secs,
+        )
+        return
+    if args.program == "stations":
+        run_info_connected_stations(
+            telnet=telnet,
+            results_dir=results_dir,
+            analysis_duration_in_minutes=args.duration
+        )
+        return
+    if args.program == "chanim_stats":
+        run_chanim_stats(
+            telnet=telnet,
+            results_dir=results_dir,
+            analysis_duration_in_minutes=args.duration
+        )
+        return
+    if args.program == "stations":
+        run_info_connected_stations(
+            telnet=telnet,
+            results_dir=results_dir,
+            analysis_duration_in_minutes=args.duration
+        )
+        return
 
 if __name__ == "__main__":
     main()

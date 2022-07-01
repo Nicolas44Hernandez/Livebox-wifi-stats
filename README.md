@@ -8,6 +8,7 @@ TODO:
 - [ ] Functions doc
 - [ ] ADD timestamp to results directory
 - [ ] add instal PyYaml to readme
+- [ ] add install sshpas to readme file
 - [ ] ADD methods doc
 - [X] double check logs
 - [X] Logs redirection fix
@@ -41,4 +42,5 @@ TODO:
 
 TODO:
 
-- [ ] add install sshpas to readme file
+- [X] Add ON / Off period as config variable
+- [X] Double check variables

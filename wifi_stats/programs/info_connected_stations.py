@@ -111,11 +111,11 @@ def band_is_up(telnet: Telnet, band: str):
     telnet.connection.read_very_eager()
     return band_is_up
 
-def run_info_connected_stations(telnet: Telnet, results_dir:str, duration_in_minutes: int):
+def run_info_connected_stations(telnet: Telnet, results_dir:str, analysis_duration_in_minutes: int):
     logger.info("RUNNING PROGRAM: stations info")
 
     start = datetime.now()
-    estimated_end = start + timedelta(minutes=duration_in_minutes)
+    estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
     # Waiting loop
