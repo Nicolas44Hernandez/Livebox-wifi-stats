@@ -12,6 +12,7 @@ TODO:
 - [ ] ADD methods doc
 - [X] double check logs
 - [X] Logs redirection fix
+- [X] Add vscode config for single program running
 
 ## SCRIPT: CHANIM STATS
 
