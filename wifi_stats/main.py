@@ -127,6 +127,9 @@ def main():
     with open(args.logs_config) as stream:
         dictConfig(yaml.full_load(stream))
 
+    logger.info(f"Running program: {args.program}")
+    logger.info(f"args: {args}")
+
     # Only for generate random files
     if args.program == "generate_random_files":
         run_generate_random_files(files_path=args.files_path)

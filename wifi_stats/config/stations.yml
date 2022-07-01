@@ -1,5 +1,5 @@
 
-FILES_PATH: /home/nicolas/workspace/stage_telnet/files_to_send/
+FILES_PATH: /home/nicolas/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
   - name: RPI 1
     ip: 192.168.1.12

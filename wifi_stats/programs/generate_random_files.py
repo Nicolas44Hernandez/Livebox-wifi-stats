@@ -22,7 +22,7 @@ def generate_big_random_bin_file(filename,size):
 
     with open('%s'%filename, 'wb') as fout:
         fout.write(os.urandom(size)) #1
-    logger.info(f"big random binary file with size %f generated in %s", size, filename)
+    logger.info(f"Random binary file with size %f generated in %s", size, filename)
     return
 
 def run_generate_random_files(files_path: str):

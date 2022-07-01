@@ -1,7 +1,17 @@
 #!/bin/bash
 
+declare -a LOG_FILES=("chanim_stats.log"
+                      "files_transfer.log"
+                      "generate_ramdom_files.log"
+                      "info_stations.log"
+                      "main.log"
+                      "static_data.log"
+                      "swich_band.log"
+                      )
+
 source config/variables.env
 
+# Print args
 echo ------------------------------
 echo ANALYSIS INFO
 echo Livebox address: $LIVEBOX_IP_ADDR
@@ -12,9 +22,20 @@ echo Logging config file: $LOGGING_CONFIG_FILE
 echo USB results device: $USB_RESULTS_DEVICE
 echo ------------------------------
 
+# Create log files
+echo "Creating log files"
+mkdir logs
+for log_file in "${LOG_FILES[@]}"
+do
+    if ! test -f "logs/$log_file"; then
+        touch "logs/$log_file"
+    fi
+done
+
+# Run Analysis
 echo ***** Running program: GENERATE RANDOM FILES
 echo Files to send in: $FILES_TO_SEND
-# python3 main.py -p generate_random_files -f $FILES_TO_SEND -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE
+python3 main.py -p generate_random_files -f $FILES_TO_SEND -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE
 
 echo ***** Running program: STATIC DATA
 python3 main.py -p static_livebox_data -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE &
