@@ -23,9 +23,6 @@ COMMANDS = {
     "get number of stations 2.4GHz": "echo -n 'EE''EE '; wl -i wl2 assoclist | wc -l; echo 'FF''FF'"
 }
 
-# Time period between each loop stats TODO: add shared parameter
-SLEEP_TIME_BETWEEN_LOOPS=1
-
 def write_stations_info_in_file(
     telnet: Telnet,
     results_dir: str,
@@ -111,22 +108,26 @@ def band_is_up(telnet: Telnet, band: str):
     telnet.connection.read_very_eager()
     return band_is_up
 
-def run_info_connected_stations(telnet: Telnet, results_dir:str, duration_in_minutes: int):
+def run_info_connected_stations(
+    telnet: Telnet,
+    results_dir:str,
+    analysis_duration_in_minutes: int,
+    sampling_period_in_seconds: int
+):
     logger.info("RUNNING PROGRAM: stations info")
 
     start = datetime.now()
-    estimated_end = start + timedelta(minutes=duration_in_minutes)
+    estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
     # Waiting loop
     now = datetime.now()
     while now < estimated_end:
+        next_sample_at = now + timedelta(seconds=sampling_period_in_seconds)
 
         # Get number of connected stations
         total_connections, connected_stations_2_4GHz, connected_stations_5GHz = get_number_of_connected_stations(telnet)
-        logger.info(f"Total connected stations: {total_connections}")
-        logger.info(f"2.4GHz band connected stations: {connected_stations_2_4GHz}")
-        logger.info(f"5GHz band connected stations: {connected_stations_5GHz}")
+        logger.info(f"Connected stations: {total_connections} 2.4GHz band: {connected_stations_2_4GHz} 5GHz band: {connected_stations_5GHz}")
 
         # Write number of connections in dedicated file
         write_nb_connections_in_file(
@@ -141,9 +142,11 @@ def run_info_connected_stations(telnet: Telnet, results_dir:str, duration_in_min
                 connections_2_4GHz=connected_stations_2_4GHz,
                 connections_5GHz=connected_stations_5GHz,
             )
-        time.sleep(SLEEP_TIME_BETWEEN_LOOPS)
         now = datetime.now()
 
+        while now < next_sample_at:
+            time.sleep(0.1)
+            now = datetime.now()
 
 
 

@@ -1,0 +1,9 @@
+{
+    //
+    // Commons
+    //
+    "editor.formatOnSave": true,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.encoding": "utf8",
+}

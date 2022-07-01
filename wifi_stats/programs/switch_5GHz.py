@@ -11,10 +11,7 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-PERIOD_ON = 40
-PERIOD_OFF = 30
-
-RESULTS_FILE_5GH_STATUS =  "band_status_5HGz.txt"
+RESULTS_FILE_5GH_STATUS =  "band_status_5GHz.txt"
 
 COMMANDS = {
     "pcb command line interface": 'pcb_cli',
@@ -62,11 +59,17 @@ def switch_band_5GHz(telnet: Telnet, new_status: bool):
     telnet.send_command("exit")
 
 
-def run_switch_5GHz(telnet: Telnet, results_dir:str, duration_in_minutes: int):
+def run_switch_5GHz(
+    telnet: Telnet,
+    results_dir:str,
+    analysis_duration_in_minutes: int,
+    on_period_in_secs,
+    off_period_in_secs: int
+    ):
     logger.info("RUNNING PROGRAM: switch 5GHz")
 
     start = datetime.now()
-    estimated_end = start + timedelta(minutes=duration_in_minutes)
+    estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
     #  activate smart wifi
@@ -81,7 +84,7 @@ def run_switch_5GHz(telnet: Telnet, results_dir:str, duration_in_minutes: int):
     switch_band_5GHz(telnet=telnet, new_status=True)
     logger.info(f"5GHz band: ON")
     band_5GHz_is_active = True
-    time.sleep(PERIOD_ON)
+    time.sleep(on_period_in_secs)
 
     # Loop
     now = datetime.now()
@@ -93,7 +96,7 @@ def run_switch_5GHz(telnet: Telnet, results_dir:str, duration_in_minutes: int):
         # log status change
         log_band_status_change(telnet=telnet, results_dir=results_dir, new_status=band_5GHz_is_active)
         # wait until next switch
-        time.sleep(PERIOD_ON if band_5GHz_is_active else PERIOD_OFF)
+        time.sleep(on_period_in_secs if band_5GHz_is_active else off_period_in_secs)
         now = datetime.now()
 
     # set band activated
