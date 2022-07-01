@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-RESULTS_FILE_5GH_STATUS =  "band_status_5HGz.txt"
+RESULTS_FILE_5GH_STATUS =  "band_status_5GHz.txt"
 
 COMMANDS = {
     "pcb command line interface": 'pcb_cli',
