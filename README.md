@@ -25,8 +25,9 @@ TODO:
 
 TODO:
 
-- [ ] Add mac addresses in result file (ifconfig arp -a)
-- [ ] Add sections by station in results file
+- [X] Add network interfaces in result file (ifconfig)
+- [X] Add mac and IP addresses in result file (arp -a)
+- [X] Add sections by station in results file
 - [ ] Firmeware version livebox
 
 ## SCRIPT INFO_CONNECTED_STATIONS

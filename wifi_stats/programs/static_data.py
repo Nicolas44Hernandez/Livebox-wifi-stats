@@ -9,7 +9,7 @@ from common.telnet import Telnet
 logger = logging.getLogger(__name__)
 
 STATIC_DATA_FILE =  "static_data.txt"
-SEPARATOR = "\n---------------------------------------------------\n"
+SEPARATOR = "\n-----------------------------------------------------------------------------\n"
 
 def write_master_station_infos(telnet: Telnet, results_dir:str):
    # Write master station header
@@ -32,11 +32,10 @@ def write_master_station_infos(telnet: Telnet, results_dir:str):
    write_separator_command = "echo '" + SEPARATOR + "' >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_separator_command)
 
-   print(telnet.connection.read_very_eager().decode('ascii'))
 
 def write_livebox_infos(telnet: Telnet, results_dir:str):
    # Write livebox header
-   livebox_header = SEPARATOR + "LIVEBOX INFOS"
+   livebox_header = "LIVEBOX INFOS" + SEPARATOR
    write_livebox_header_command = "echo '" + livebox_header + "' >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_livebox_header_command)
 
@@ -50,6 +49,33 @@ def write_livebox_infos(telnet: Telnet, results_dir:str):
    write_broadcom_version_command = "wl ver" + " >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_broadcom_version_command)
 
+   # Write network interfaces info
+   write_livebox_network_interfaces = "echo 'Network interfaces:' >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_livebox_network_interfaces)
+   write_network_interfaces_command = "ifconfig" + " >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_network_interfaces_command)
+
+   # Write separator
+   write_separator_command = "echo '" + SEPARATOR + "' >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_separator_command)
+
+
+def write_stations_infos(telnet: Telnet, results_dir:str):
+   # Write stations header
+   stations_header = "CONNECTED STATIONS INFOS" + SEPARATOR
+   write_connected_stations_header_command = "echo '" + stations_header + "' >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_connected_stations_header_command)
+
+   # Write arp table
+   write_connected_stations = "echo 'ARP:' >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_connected_stations)
+   write_connected_stations_info_command = "arp -a" + " >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_connected_stations_info_command)
+
+   # Write separator
+   write_separator_command = "echo '" + SEPARATOR + "' >> " + results_dir + "/" + STATIC_DATA_FILE
+   telnet.send_command(write_separator_command)
+
 def run_static_data(telnet: Telnet, results_dir:str):
    logger.info("RUNNING PROGRAM: static data")
 
@@ -58,6 +84,9 @@ def run_static_data(telnet: Telnet, results_dir:str):
 
    # write livebox infos
    write_livebox_infos(telnet, results_dir)
+
+   # write stations infos
+   write_stations_infos(telnet, results_dir)
 
 
 
