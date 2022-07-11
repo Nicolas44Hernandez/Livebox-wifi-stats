@@ -27,6 +27,12 @@ install sshpass
 sudo apt-get install -y sshpass
 ```
 
+install arp
+
+```bash
+sudo apt-get install -y net-tools
+```
+
 ## RUN ANALISIS
 
 You can run the `run_analysis.sh` script to :
