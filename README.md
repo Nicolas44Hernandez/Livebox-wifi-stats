@@ -33,6 +33,11 @@ install arp
 sudo apt-get install -y net-tools
 ```
 
+In addition, the following Python packages are required:
+
+- PyYAML
+- telnetlib3
+
 ## RUN ANALISIS
 
 You can run the `run_analysis.sh` script to :
