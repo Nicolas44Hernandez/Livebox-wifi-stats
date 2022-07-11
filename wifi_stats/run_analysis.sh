@@ -6,7 +6,7 @@ declare -a LOG_FILES=("chanim_stats.log"
                       "info_stations.log"
                       "main.log"
                       "static_data.log"
-                      "swich_band.log"
+                      "switch_band.log"
                       )
 
 source config/variables.env

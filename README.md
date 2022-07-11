@@ -111,7 +111,7 @@ Log files:
 - info_stations.log
 - main.log
 - static_data.log
-- swich_band.log
+- switch_band.log
 
 ## RESULTS FILES
 

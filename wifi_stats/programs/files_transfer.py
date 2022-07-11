@@ -98,7 +98,7 @@ def send_file_to_station(station, files_path: str):
     _file = select_random_file(files_path)
 
     # Log start of transfer
-    _log_line = f"Seding file {_file} to {station_ip} rate: {data_rate} kbps "
+    _log_line = f"Sending file {_file} to {station_ip} rate: {data_rate} kbps "
     logger.info(_log_line)
 
 

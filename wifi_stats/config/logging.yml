@@ -96,5 +96,5 @@ loggers:
 
   programs.switch_5GHz:
     level: DEBUG
-    handlers: [swich_band]
+    handlers: [switch_band]
     propagate: no
