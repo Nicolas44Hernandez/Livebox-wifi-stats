@@ -1,7 +1,5 @@
-""" Objectif : Récupérer les données sur le flux radio des bandes de fréquences 2,4 GHz et 5 GHz
-    Comment  : On se connecte en Telnet à la Livebox et on exécute des commandes (commande principale : wl chanim_stats) dans une boucle afin de récuperer ses données
-    Enregistrement sur clé USB :  /var/usbmount/kernel::dev-sdb1/Mes_chanim_stats_2g_30-05-22.txt
-                                  /var/usbmount/kernel::dev-sdb1/Mes_chanim_stats_5g_30-05-22.txt
+"""
+Retrieve stats periodicaly for the 2.4 GHz and 5 GHz frequency bands by ussing the command wl chanim_stats.
 """
 
 import logging
@@ -15,10 +13,19 @@ RESULTS_FILE_2G =  "chanim_stats_2g.txt"
 RESULTS_FILE_5G =  "chanim_stats_5g.txt"
 
 COMMANDS = {
-    "get header": 'export stats=$(wl -i wl0 chanim_stats | head -2); echo horodatage | (echo -n -e "$stats \t"  && cat)',
+    "get header": 'export stats=$(wl -i wl0 chanim_stats | head -2); echo master_station_timestamp | (echo -n -e "$stats \t"  && cat)',
     "get stats 2.4GHz" : 'export stats=$(wl -i wl2 chanim_stats | tail -1); date -Iseconds | (echo -n -e "$stats \t"  && cat)',
     "get stats 5GHz": 'export stats=$(wl -i wl0 chanim_stats | tail -1); date -Iseconds | (echo -n -e "$stats \t"  && cat)'
 }
+
+
+def add_ms_timestamp_to_command(original_command: str):
+    """Add master machine timestamp to write command"""
+    now = str(datetime.now())
+    splitted = original_command.split('-Iseconds')
+    new_command = splitted[0] + "-Iseconds; echo " + now + splitted[1]
+    return new_command
+
 
 def run_chanim_stats(
     telnet: Telnet,
@@ -26,6 +33,8 @@ def run_chanim_stats(
     analysis_duration_in_minutes: int,
     sampling_period_in_seconds: int
 ):
+    """Entry point for chanim stats program"""
+
     logger.info("RUNNING PROGRAM: chanim stats")
     start = datetime.now()
     estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
@@ -48,8 +57,8 @@ def run_chanim_stats(
     now = datetime.now()
     while now < estimated_end:
         next_sample_at = now + timedelta(seconds=sampling_period_in_seconds)
-        telnet.send_command(get_stats_2G_command)
-        telnet.send_command(get_stats_5G_command)
+        telnet.send_command(add_ms_timestamp_to_command(get_stats_2G_command))
+        telnet.send_command(add_ms_timestamp_to_command(get_stats_5G_command))
         now = datetime.now()
 
         while now < next_sample_at:

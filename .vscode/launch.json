@@ -75,6 +75,8 @@
                 "2",
                 "-sp",
                 "3",
+                "-sc",
+                "${workspaceFolder}/wifi_stats/config/stations_info_config.yml",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
                 "-rd",

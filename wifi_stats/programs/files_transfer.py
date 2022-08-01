@@ -1,11 +1,5 @@
-""" Objectif      : Envoyer des fichiers en continu aux stations connectées, afin de créer du trafic dans le réseau. Ce trafic permettra de rendre les données récupérées
-                   sur les bandes de fréquences  plus interressante
-    Comment       : On récupère les adresses IP connectés sur le réseau, puis on envoie un fichier aléatoire (dans notre liste des fichiers) avec un débit aléatoire
-                   (entre 1 et 400 000) à chaque adresse IP. Cette action est placé dans un LoopTimer et s'arrete lorsque la durée paramétrer en amont arrive à sa fin
-    Données récupérées: la ligne d'envoi du fichier avec toutes ces caractéristiques: horodatage, nom du fichier envoyé, adresse IP de la station, débit utilisé
-    Flexibilité   : Durant l'exécution de ce programme, les stations ayant déja été connectée au début pourront se déconnecter et se reconnecté
-    Inconvéniants : -Le nombres de stations connectées au Wi-Fi seront au maximum de 3.
-                    -De plus, de nouvelles stations ne s'étant pas connectées au début du test, ne pourront pas se connecter pendant le test
+"""
+Send files continuously to connected stations in order to create traffic in the network.
 """
 
 # Importation des librairies
@@ -15,19 +9,13 @@ import random
 from random import randint
 from threading import Thread, Event
 import os
-import re
-import subprocess
 from typing import Dict
 import yaml
-
-import re
 from datetime import datetime
 import logging
 import time
-from common.telnet import Telnet
 
 logger = logging.getLogger(__name__)
-# TODO: LOGS
 
 LIVEBOX_IP_ADDRESS = "192.168.1.1"
 
@@ -56,6 +44,7 @@ class FilesSender(Thread):
         self.finished.set()
 
     def run(self):
+        """Starts the file transfer"""
         if self.wait_first_time:
             self.finished.wait(self.interval)
             self.wait_first_time = True
@@ -74,20 +63,25 @@ class FilesSender(Thread):
 
 
 def get_random_data_rate():
-    """sélectionne un débit au hasard dans la liste des débits. La retourne comme second argument dans la fonction envoie_script"""
+    """
+    Select a random data rate from 1kbps to 400 Mbps that would be the max bitrate threshold
+    used when downloading a file.
+    """
     return str(
         randint(1, 400000)
-    )  # en kbps # la valeur retourné correspond au seuil max du débit utilisé lors du téléchargement d'un fichier
+    )
 
 
 def select_random_file(files_path: str):
-    # sélectionne un fichier au hasard dans la liste des dfichiers. La retourne comme deuxième argument dans la fonction envoie_script
+    """select a random file from the list."""
+
     files_list = os.listdir(files_path)
     selected_file = f"{files_path}{random.choice(files_list)}"
     return selected_file
 
 
 def send_file_to_station(station, files_path: str):
+    """Send a ramdom file with a random rate to a station over SCP"""
 
     # Get station params
     station_ip = station["ip"]
@@ -101,18 +95,22 @@ def send_file_to_station(station, files_path: str):
     _log_line = f"Sending file {_file} to {station_ip} rate: {data_rate} kbps "
     logger.info(_log_line)
 
-
     # Run SCP file transfer
     scp_command = (
         f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:Documents"
     )
     os.system(scp_command)
-    sleep(0.2)  # TODO: NECSSARY ?
+    sleep(0.2)
 
 
 def get_test_params(config_file: str):
-    logger.info(f"Config file: {config_file}")
+    """
+    Retrieve the following test params from the yml config file:
+    - STATIONS: stations where the files are going to be send and scp config
+    - FILES_PATH: files to send folder in master station
+    """
 
+    logger.info(f"Config file: {config_file}")
     # Read yml config file
     with open(config_file, "r") as stream:
         try:
@@ -129,6 +127,8 @@ def get_test_params(config_file: str):
 
 
 def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
+    """Entry point for files transfer program"""
+
     logger.info("RUNNING PROGRAM: files transfer")
     start = datetime.now()
     estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
