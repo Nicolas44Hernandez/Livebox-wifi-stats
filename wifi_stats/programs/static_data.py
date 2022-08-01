@@ -18,7 +18,12 @@ def write_master_station_infos(telnet: Telnet, results_dir:str):
    telnet.send_command(write_master_station_header_command)
 
    # Write master station os
-   master_station_os = subprocess.check_output("hostnamectl", shell=True).decode('ascii').strip()
+   try:
+      master_station_os = subprocess.check_output("hostnamectl", shell=True).decode('ascii').strip()
+   except:
+      # Since hostnamectl doesn't work for WSL
+      master_station_os = subprocess.check_output("uname -a", shell=True).decode('ascii').strip()
+
    master_station_os = SEPARATOR + master_station_os
    write_master_station_os_command = "echo '" + master_station_os + "' >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_master_station_os_command)

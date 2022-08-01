@@ -15,17 +15,28 @@ This program aims to generate Wi-Fi statistics of the Livebox and the connected 
 
 Required python version > 3.6
 
-instal PyYaml
+install PyYaml
 
 ```bash
-sudo apt -y install python-yaml
+sudo apt -y install python3-yaml
 ```
 
-install sshpas
+install sshpass
 
 ```bash
 sudo apt-get install -y sshpass
 ```
+
+install arp
+
+```bash
+sudo apt-get install -y net-tools
+```
+
+In addition, the following Python packages are required:
+
+- PyYAML
+- telnetlib3
 
 ## RUN ANALISIS
 
@@ -111,7 +122,7 @@ Log files:
 - info_stations.log
 - main.log
 - static_data.log
-- swich_band.log
+- switch_band.log
 
 ## RESULTS FILES
 

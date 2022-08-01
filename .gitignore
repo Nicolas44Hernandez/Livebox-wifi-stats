@@ -9,3 +9,6 @@ files_to_send
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Venv
+.venv*/
