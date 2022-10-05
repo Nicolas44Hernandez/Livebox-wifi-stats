@@ -45,10 +45,10 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
-  swich_band:
+  switch_band:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/nicolas/workspace/Livebox-wifi-stats/wifi_stats/logs/swich_band.log
+    filename: /home/nicolas/workspace/Livebox-wifi-stats/wifi_stats/logs/switch_band.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 

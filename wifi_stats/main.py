@@ -29,6 +29,7 @@ def main():
         -pw     --password                 Telnet connection password
         -f      --files_path               Random files path
         -fc     --files_transfer_config    Config file for files transfer program
+        -sc    --stations_columns_config  Config file for the result table in info stations program
         -d      --duration                 Analysis duration
         -sp     --sampling_period_in_secs  Sampling period for information request
         -on     --on_period_in_secs        5GHz band ON period in secs
@@ -86,24 +87,35 @@ def main():
         type=str,
         help="Config file for files transfer program",
     )
+
+    parser.add_argument(
+        "-sc",
+        "--stations_columns_config",
+        type=str,
+        help="Config file for the result table in info stations program",
+    )
+
     parser.add_argument(
         "-d",
         "--duration",
         type=int,
         help="Analysis duration in minutes",
     )
+
     parser.add_argument(
         "-sp",
         "--sampling_period_in_secs",
         type=int,
         help="Sampling period for information request",
     )
+
     parser.add_argument(
         "-on",
         "--on_period_in_secs",
         type=int,
         help="5GHz band ON period in secs",
     )
+
     parser.add_argument(
         "-off",
         "--off_period_in_secs",
@@ -180,7 +192,8 @@ def main():
             telnet=telnet,
             results_dir=results_dir,
             analysis_duration_in_minutes=args.duration,
-            sampling_period_in_seconds=args.sampling_period_in_secs
+            sampling_period_in_seconds=args.sampling_period_in_secs,
+            columns_config_file=args.stations_columns_config,
         )
         return
 

@@ -58,9 +58,11 @@ This can be done from the file `wifi_stats/config/variables.env`
 | ANALYSIS_DURATION_IN_MINUTES | Analysis total duration in minutes | 60 |
 | WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS | Time ON of the 5GHz band | 40 |
 | WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS | Time OFF of the 5GHz band | 30 |
+| SAMPLING_PERIOD_IN_SECS | Results sample period| 4 |
 | FILES_TO_SEND | Directory of the files to send to stations | workspace/Livebox-wifi-stats/files_to_send |
 | FILES_TRASNSFER_CONFIG | Files transfer configuration files | workspace/Livebox-wifi-stats/wifi_stats/config/stations.yml |
 | LOGGING_CONFIG_FILE | Logging configuration file | workspace/Livebox-wifi-stats/wifi_stats/config/logging.yml |
+| CONNECTED_STATIONS_RESULTS_CONFIG | Connected stations results config file | workspace/Livebox-wifi-stats/wifi_stats/config/stations_info_config.yml |
 | USB_RESULTS_DEVICE | USB drive to store the results in the livebox | dev-sda1 |
 
 ### Files transfer configuration
@@ -140,18 +142,17 @@ The following result files are generated and saved to the usb drive:
 General:
 
 - [X] README.md
-- [ ] Functions doc
 - [X] ADD timestamp to results directory
 - [X] add instal PyYaml to readme
 - [X] add install sshpas to readme file
-- [ ] ADD methods doc
+- [X] ADD methods doc
 - [X] double check logs
 - [X] Logs redirection fix
 - [X] Add vscode config for single program running
 
 Script Chanim stats:
 
-- [ ] Add master station timestamp as new column
+- [X] Add master station timestamp as new column
 - [X] Manage main loop with absolut time
 
 Script static data:
@@ -159,15 +160,15 @@ Script static data:
 - [X] Add network interfaces in result file (ifconfig)
 - [X] Add mac and IP addresses in result file (arp -a)
 - [X] Add sections by station in results file
-- [ ] Firmeware version livebox
+- [X] Firmeware version livebox
 
 Script info conected stations
 
-- [ ] Show connection number results file as table
-- [ ] Show single station info as a table
-- [ ] One file by mac address
+- [X] Show connection number results file as table
+- [X] Show single station info as a table
+- [X] One file by mac address
 - [X] Manage main loop with absolut time
-- [ ] Check error in stations result file
+- [X] Check error in stations result file
 
 Script switch 5GHz
 

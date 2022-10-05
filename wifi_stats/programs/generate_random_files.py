@@ -1,3 +1,7 @@
+"""
+Generate random files from that could be send to the connected stations
+"""
+
 import os
 import logging
 
@@ -35,6 +39,8 @@ def generate_big_random_bin_file(filename,size):
     return
 
 def run_generate_random_files(files_path: str):
+    """Entry point for generate random files program"""
+
     logger.info("RUNNING PROGRAM: generate random files")
 
     for i, size in enumerate(FILES_SIZE_IN_BYTES):

@@ -1,8 +1,5 @@
-""" Objectifs : - ALlumer la bande de fréquence 2,4GHz et le smart Wi-Fi
-                - Activer et désactiver la bande de fréquence 5 GHz à différents intervalles définit en amont
-    Comment   : On se connecte à la Livebox en Telnet, puis en "pcb_cli", et on commence par exécuter les commandes pour activer le 2,4 GHz et le smart wi-Fi
-    et on désactive le 5 GHz. Dans un deuxième temps, on active et désactive le 5 GHz en fonction des paramètres à définir au préalable
-                (duree_activation_5GHz_s, duree_desactivation_5GHz_s) qui sont relié à 2 compteurs (i et n) qui font le switch active/désactive
+"""
+Switch the 5 GHz frequency band on and off at different time intervals by ussing the pcb_cli commands.
 """
 import time
 import logging
@@ -22,6 +19,7 @@ COMMANDS = {
 }
 
 def activate_smart_wifi(telnet: Telnet):
+    """Activate smart wifi in the livebox"""
 
     # run pcb_line command
     telnet.send_command(COMMANDS['pcb command line interface'])
@@ -31,6 +29,7 @@ def activate_smart_wifi(telnet: Telnet):
     telnet.send_command("exit")
 
 def activate_band_2_4GHz(telnet: Telnet):
+    """Turn on the 2.4GHz wifi band"""
 
     # run pcb_line command
     telnet.send_command(COMMANDS['pcb command line interface'])
@@ -40,6 +39,8 @@ def activate_band_2_4GHz(telnet: Telnet):
     telnet.send_command("exit")
 
 def log_band_status_change(telnet: Telnet, results_dir: str, new_status: bool):
+    """Log the 5GHz wifi band status """
+
     # Write band activation in status file
     date_time = str(datetime.now())
     status = "ON" if new_status else "OFF"
@@ -50,6 +51,8 @@ def log_band_status_change(telnet: Telnet, results_dir: str, new_status: bool):
 
 
 def switch_band_5GHz(telnet: Telnet, new_status: bool):
+    """Switch the 5GHz wifi band status """
+
     status = "activate" if new_status else "desactivate"
     # run pcb_line command
     telnet.send_command(COMMANDS["pcb command line interface"])
@@ -66,6 +69,8 @@ def run_switch_5GHz(
     on_period_in_secs,
     off_period_in_secs: int
     ):
+    """Entry point to switch 5GHz band program"""
+
     logger.info("RUNNING PROGRAM: switch 5GHz")
 
     start = datetime.now()

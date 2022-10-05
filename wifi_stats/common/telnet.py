@@ -1,4 +1,6 @@
-
+"""
+Telnet connection service
+"""
 import telnetlib
 import socket
 import logging
@@ -25,8 +27,10 @@ class Telnet:
         self.super_user_session = False
         self.time_between_commands = 0.2
 
+
     def create_telnet_connection(self):
         """Create telnet connection with host"""
+
         # try to connect
         try:
             tn_connection = telnetlib.Telnet(
@@ -49,15 +53,20 @@ class Telnet:
         logger.debug(f"Telnet connection established with host: %s", self.host)
         return tn_connection
 
+
     def close(self):
+        """Close telnet connection"""
+
         try:
             self.connection.write(b"exit\n")
         except (socket.timeout, socket.error):
             logger.error("Error in telnet connection")
         logger.debug(f"Telnet connection closed with host: %s", self.host)
 
+
     def send_command(self, command: str):
         """Send command to telnet host"""
+
         try:
             command = command + "\n"
             self.connection.write(command.encode("ascii"))
@@ -65,8 +74,12 @@ class Telnet:
         except (socket.timeout, socket.error):
             logger.error("Error in telnet connection")
 
+
     def create_results_dir(self, device: str, results_directory: str, box_name: str):
-        """Create a clean dir for telnet results, if directory exists files will be overwritten"""
+        """
+        Create a clean dir for telnet results, if directory exists files will be overwritten
+        """
+
         timestamp=str(int(datetime.now().timestamp()))
         box_directory = results_directory + "/" + box_name
         analysis_results_directory = box_directory + "/" + str(date.today()) + "-" + timestamp

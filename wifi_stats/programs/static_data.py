@@ -1,5 +1,5 @@
-"""Objectif : Récupérées des données non variables : versions, systéme d'exploitation, espace disponible
-   Comment  : On se connecte en Telnet pour récupérer certaines données (version des commandes Broadcom) et on se déconnecte pour récupérer les autres
+"""
+Retrieve static data froml the master station, livebox and connected stations.
 """
 
 import subprocess
@@ -12,6 +12,7 @@ STATIC_DATA_FILE =  "static_data.txt"
 SEPARATOR = "\n-----------------------------------------------------------------------------\n"
 
 def write_master_station_infos(telnet: Telnet, results_dir:str):
+   """Write master station static infos in dedicated file"""
    # Write master station header
    master_station_header = SEPARATOR + "MASTER STATION INFOS"
    write_master_station_header_command = "echo '" + master_station_header + "' >> " + results_dir + "/" + STATIC_DATA_FILE
@@ -39,6 +40,7 @@ def write_master_station_infos(telnet: Telnet, results_dir:str):
 
 
 def write_livebox_infos(telnet: Telnet, results_dir:str):
+   """Write livebox static infos in dedicated file"""
    # Write livebox header
    livebox_header = "LIVEBOX INFOS" + SEPARATOR
    write_livebox_header_command = "echo '" + livebox_header + "' >> " + results_dir + "/" + STATIC_DATA_FILE
@@ -66,6 +68,7 @@ def write_livebox_infos(telnet: Telnet, results_dir:str):
 
 
 def write_stations_infos(telnet: Telnet, results_dir:str):
+   """Write conected stations static infos in dedicated file"""
    # Write stations header
    stations_header = "CONNECTED STATIONS INFOS" + SEPARATOR
    write_connected_stations_header_command = "echo '" + stations_header + "' >> " + results_dir + "/" + STATIC_DATA_FILE
@@ -74,7 +77,10 @@ def write_stations_infos(telnet: Telnet, results_dir:str):
    # Write arp table
    write_connected_stations = "echo 'ARP:' >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_connected_stations)
-   write_connected_stations_info_command = "arp -a" + " >> " + results_dir + "/" + STATIC_DATA_FILE
+
+   # Write master station python version
+   arp_table = subprocess.check_output("arp -a", shell=True).decode('ascii').strip()
+   write_connected_stations_info_command = "echo '" + arp_table + "' >> " + results_dir + "/" + STATIC_DATA_FILE
    telnet.send_command(write_connected_stations_info_command)
 
    # Write separator
@@ -82,6 +88,8 @@ def write_stations_infos(telnet: Telnet, results_dir:str):
    telnet.send_command(write_separator_command)
 
 def run_static_data(telnet: Telnet, results_dir:str):
+   """Entry point to static data program"""
+
    logger.info("RUNNING PROGRAM: static data")
 
    # write master stations infos
