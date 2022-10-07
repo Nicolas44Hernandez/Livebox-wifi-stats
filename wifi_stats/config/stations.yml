@@ -1,14 +1,24 @@
 
-FILES_PATH: /home/nicolas/workspace/Livebox-wifi-stats/files_to_send/
+FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
-  - name: RPI 1
-    ip: 192.168.1.12
+  - name: RPI Box
+    ip: 192.168.1.27
     ssh_user: nico
     ssh_password: nico
-    send_interval: 30
-  - name: RPI 2
+    send_interval_in_secs: 15
+  - name: RPI Camera
+    ip: 192.168.1.12
+    ssh_user: pi
+    ssh_password: pi
+    send_interval_in_secs: 15
+  - name: RPI Relays
+    ip: 192.168.1.28
+    ssh_user: pi
+    ssh_password: pi
+    send_interval_in_secs: 15
+  - name: RPI Cloud
     ip: 192.168.1.13
     ssh_user: nico
     ssh_password: nico
-    send_interval: 30
+    send_interval_in_secs: 15
 

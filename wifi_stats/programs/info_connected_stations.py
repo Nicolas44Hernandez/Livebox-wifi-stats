@@ -74,10 +74,10 @@ def write_single_station_info(
         header = ""
         for i, col in enumerate(columns):
             if i != 0:
-                header += "    "
+                header += "\t"
             header += col
         # add wifiband and datetime
-        header = f"{header}    band_wifi    date_time"
+        header = f"{header}\tband_wifi\tdate_time"
 
         # Write header
         write_header_command = f"echo '{header}' {output_redirection_command}"
@@ -96,7 +96,7 @@ def write_single_station_info(
             if col in line:
                 value = line.split(col)[1][1:].replace("= ", "")
                 if i != 0:
-                    new_entry += "    "
+                    new_entry += "\t"
                 new_entry += f"{value}"
                 continue
 
@@ -104,7 +104,7 @@ def write_single_station_info(
         return
 
     # add wifiband and datetime
-    new_entry = f"{new_entry}    {wifi_band}    {date_time}"
+    new_entry = f"{new_entry}\t{wifi_band}\t{date_time}"
     # Write entry
     write_stations_info_command = f"echo '{new_entry}' {output_redirection_command}"
     telnet.send_command(write_stations_info_command)

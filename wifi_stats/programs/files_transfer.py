@@ -35,7 +35,7 @@ class FilesSender(Thread):
 
     def __get_occurrences(self, interval, duration):
         """Returns the number of times that the file will be sent"""
-        occurenc_max = duration / interval
+        occurenc_max = (duration * 60) / interval
         logger.info(f"Files to send: {occurenc_max}")
         return occurenc_max
 
@@ -52,13 +52,16 @@ class FilesSender(Thread):
         if not self.finished.is_set():
             self.function(*self.args, **self.kwargs)
             self.curr_occurrences += 1
+            logger.info(f"curr_occurrences incremented {self.curr_occurrences}")
         # Loops stops after max_occurrences
         if (
             self.curr_occurrences >= self.max_occurrences
         ):
+            logger.info(f"finished setted")
             self.finished.set()
         else:
             # Run timer
+            logger.info(f"Recursion")
             self.run()
 
 
@@ -97,10 +100,17 @@ def send_file_to_station(station, files_path: str):
 
     # Run SCP file transfer
     scp_command = (
-        f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:Documents"
+        f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/"
     )
     os.system(scp_command)
     sleep(0.2)
+    logger.info("File sent")
+    scp_command_rm = (
+        f"sshpass -p '{ssh_password}' ssh {ssh_usr}@{station_ip} rm -r /home/{ssh_usr}/files_transfer/*"
+    )
+    os.system(scp_command_rm)
+    sleep(0.2)
+    logger.info("File removed")
 
 
 def get_test_params(config_file: str):
@@ -140,7 +150,7 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
 
     for station in stations_dict:
         file_sender = FilesSender(
-            interval=station["send_interval"],
+            interval=station["send_interval_in_secs"],
             duration=analysis_duration_in_minutes,
             function=send_file_to_station,
             args=(station, files_path),
@@ -154,6 +164,7 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
         time.sleep(60)
         now = datetime.now()
 
+    logger.info(f"script END, killing active threads")
     # Kill threads
     for file_sender in file_senders:
         file_sender.finished.set()
