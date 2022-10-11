@@ -17,7 +17,7 @@ RESULTS_FILE_CONNECTIONS_NUMBER =  "connections_number.txt"
 RESULTS_FILE_INFO_STATION =  "station_"
 
 COMMANDS = {
-    "get header": 'echo connected    2.4GHz    5GHz    datetime',
+    "get header": 'echo connected\t2.4GHz\t5GHz\tdatetime',
     "check if 5GHz band is up": 'wl -i wl0 bss',
     "check if 2.4GHz band is up": 'wl -i wl2 bss',
     "get stations MAC list 5GHz": "echo -n 'EE''EE '; wl -i wl0 assoclist | sed 's/assoclist //'; echo 'FF''FF'",
@@ -156,8 +156,12 @@ def write_nb_connections_in_file(
 
     # Write connected stations command
     date_time = str(datetime.now())
-    write_connected_stations_command = f"echo {connections_5GHz}    {connections_number}    {connections_2_4GHz}    {date_time}" + output_redirection_command
 
+
+    # create entry
+    new_entry = f"{connections_number}\t{connections_5GHz}\t{connections_2_4GHz}\t{date_time}"
+    # Write entry
+    write_connected_stations_command = f"echo '{new_entry}' {output_redirection_command}"
     # Send command
     telnet.send_command(write_connected_stations_command)
 
@@ -189,8 +193,8 @@ def get_connected_stations(telnet: Telnet):
     # check if 5GHz band is up
     if band_is_up(telnet, "5GHz"):
         connected_stations_5GHz = get_connected_stations_in_band(telnet, "5GHz")
-
     total_connections = len(connected_stations_2_4GHz) + len(connected_stations_5GHz)
+    logger.info(f"total_connections={total_connections}  2.4GHz:{connected_stations_2_4GHz}  5GHz:{connected_stations_5GHz}")
 
     return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
 
