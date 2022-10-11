@@ -11,11 +11,6 @@ STATIONS:
     ssh_user: pi
     ssh_password: pi
     send_interval_in_secs: 15
-  - name: RPI Relays
-    ip: 192.168.1.28
-    ssh_user: pi
-    ssh_password: pi
-    send_interval_in_secs: 15
   - name: RPI Cloud
     ip: 192.168.1.13
     ssh_user: nico

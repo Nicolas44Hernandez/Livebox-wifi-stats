@@ -142,7 +142,7 @@ def main():
 
     # Load logging configuration
     with open(args.logs_config) as stream:
-        dictConfig(yaml.full_load(stream))
+        dictConfig(yaml.load(stream))
 
     logger.info(f"Running program: {args.program}")
     logger.info(f"args: {args}")
