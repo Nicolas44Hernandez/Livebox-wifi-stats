@@ -87,12 +87,17 @@ STATIONS:
     ip: 192.168.1.12
     ssh_user: nico
     ssh_password: nico
-    send_interval: 30
-  - name: RPI 2
+    initial_data_rate_in_kbps: 500
+    throughput_increment_in_kbps: 1000
+    transfer_nb_per_step: 3
+    send_interval_in_secs: 0.01
     ip: 192.168.1.13
     ssh_user: nico
     ssh_password: nico
-    send_interval: 30u
+    initial_data_rate_in_kbps: 500
+    throughput_increment_in_kbps: 1000
+    transfer_nb_per_step: 3
+    send_interval_in_secs: 0.01
 ```
 
 ### RUN ALL THE PROGRAMS
@@ -125,6 +130,7 @@ Log files:
 - main.log
 - static_data.log
 - switch_band.log
+- telnet.log
 
 ## RESULTS FILES
 
@@ -141,36 +147,8 @@ The following result files are generated and saved to the usb drive:
 
 General:
 
-- [X] README.md
-- [X] ADD timestamp to results directory
-- [X] add instal PyYaml to readme
-- [X] add install sshpas to readme file
-- [X] ADD methods doc
-- [X] double check logs
-- [X] Logs redirection fix
-- [X] Add vscode config for single program running
+- [ ] New results file with measurements of Tx and Rx per antenna (command wl -i wl2 counters )
 
-Script Chanim stats:
+Script Files Transfer:
 
-- [X] Add master station timestamp as new column
-- [X] Manage main loop with absolut time
-
-Script static data:
-
-- [X] Add network interfaces in result file (ifconfig)
-- [X] Add mac and IP addresses in result file (arp -a)
-- [X] Add sections by station in results file
-- [X] Firmeware version livebox
-
-Script info conected stations
-
-- [X] Show connection number results file as table
-- [X] Show single station info as a table
-- [X] One file by mac address
-- [X] Manage main loop with absolut time
-- [X] Check error in stations result file
-
-Script switch 5GHz
-
-- [X] Add ON / Off period as config variable
-- [X] Double check variables
+- [ ] Modify file deletion to limit or eliminate downtime in traffic generation
