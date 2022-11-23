@@ -23,9 +23,8 @@ class Telnet:
         self.login = login
         self.password = password
         self.telnet_timeout_in_secs = telnet_timeout_in_secs
-        self.connection = self.create_telnet_connection()
         self.super_user_session = False
-        self.time_between_commands = 0.2
+        self.time_between_commands = 0.5
 
 
     def create_telnet_connection(self):
@@ -53,26 +52,30 @@ class Telnet:
         logger.debug(f"Telnet connection established with host: %s", self.host)
         return tn_connection
 
-
-    def close(self):
-        """Close telnet connection"""
-
-        try:
-            self.connection.write(b"exit\n")
-        except (socket.timeout, socket.error):
-            logger.error("Error in telnet connection")
-        logger.debug(f"Telnet connection closed with host: %s", self.host)
-
-
     def send_command(self, command: str):
         """Send command to telnet host"""
-
         try:
+            connection = self.create_telnet_connection()
             command = command + "\n"
-            self.connection.write(command.encode("ascii"))
+            connection.write(command.encode("ascii"))
             time.sleep(self.time_between_commands)
-        except (socket.timeout, socket.error):
-            logger.error("Error in telnet connection")
+            connection.write(b"exit\n")
+        except Exception as e:
+            logger.error(f"Error in telnet connection {e}")
+
+
+    def send_command_and_read_result(self, command: str):
+        """Send command to telnet host and read result"""
+        try:
+            connection = self.create_telnet_connection()
+            command = command + "\n"
+            connection.write(command.encode("ascii"))
+            time.sleep(self.time_between_commands)
+            command_result = connection.read_until(b"FFFF").decode('ascii')
+            connection.write(b"exit\n")
+            return command_result
+        except Exception as e:
+            logger.error(f"Error in telnet connection {e}")
 
 
     def create_results_dir(self, device: str, results_directory: str, box_name: str):
@@ -87,11 +90,12 @@ class Telnet:
         create_box_dir_command = "mkdir " + device + box_directory + "\n"
         create_analysis_dir_command = "mkdir " + device + analysis_results_directory + "\n"
         try:
-            self.connection.write(create_dir_command.encode("ascii"))
+            connection = self.create_telnet_connection()
+            connection.write(create_dir_command.encode("ascii"))
             time.sleep(self.time_between_commands)
-            self.connection.write(create_box_dir_command.encode("ascii"))
+            connection.write(create_box_dir_command.encode("ascii"))
             time.sleep(self.time_between_commands)
-            self.connection.write(create_analysis_dir_command.encode("ascii"))
+            connection.write(create_analysis_dir_command.encode("ascii"))
             time.sleep(self.time_between_commands)
         except (socket.timeout, socket.error):
             logger.error("Error in telnet connection")

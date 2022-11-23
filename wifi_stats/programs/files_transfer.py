@@ -1,5 +1,5 @@
 """
-Send files continuously to connected stations in order to create traffic in the network.
+Send files continuously to stations in order to create traffic in the network.
 """
 
 # Importation des librairies
@@ -17,8 +17,6 @@ import time
 
 logger = logging.getLogger(__name__)
 
-LIVEBOX_IP_ADDRESS = "192.168.1.1"
-
 class FilesSender(Thread):
     def __init__(
         self, interval, duration, function, args=None, kwargs=None, wait_first_time=True
@@ -35,7 +33,7 @@ class FilesSender(Thread):
 
     def __get_occurrences(self, interval, duration):
         """Returns the number of times that the file will be sent"""
-        occurenc_max = duration / interval
+        occurenc_max = (duration * 60) / interval
         logger.info(f"Files to send: {occurenc_max}")
         return occurenc_max
 
@@ -48,29 +46,23 @@ class FilesSender(Thread):
         if self.wait_first_time:
             self.finished.wait(self.interval)
             self.wait_first_time = True
-        # Increment curr_occurences if curr_occ < max_occ
+        self.kwargs["transfer_number"] = self.curr_occurrences -1
         if not self.finished.is_set():
-            self.function(*self.args, **self.kwargs)
+            logger.info(f"Iteration: {self.curr_occurrences}")
+            if self.curr_occurrences <= self.args[0]["transfer_nb_per_step"]:
+                time.sleep(20)
+            else:
+                self.function(*self.args, **self.kwargs)
             self.curr_occurrences += 1
         # Loops stops after max_occurrences
         if (
             self.curr_occurrences >= self.max_occurrences
         ):
+            logger.info(f"finished setted")
             self.finished.set()
         else:
             # Run timer
             self.run()
-
-
-def get_random_data_rate():
-    """
-    Select a random data rate from 1kbps to 400 Mbps that would be the max bitrate threshold
-    used when downloading a file.
-    """
-    return str(
-        randint(1, 400000)
-    )
-
 
 def select_random_file(files_path: str):
     """select a random file from the list."""
@@ -79,17 +71,29 @@ def select_random_file(files_path: str):
     selected_file = f"{files_path}{random.choice(files_list)}"
     return selected_file
 
+def get_iteration_file(files_path:str, iteration: int, transfers_per_step: int):
+    """Get file for iteration"""
+    file_numner = int(iteration / transfers_per_step)
+    selected_file = f"{files_path}random_file{file_numner}.txt"
+    return selected_file
 
-def send_file_to_station(station, files_path: str):
+
+def send_file_to_station(station, files_path: str, transfer_number: int):
     """Send a ramdom file with a random rate to a station over SCP"""
 
     # Get station params
     station_ip = station["ip"]
     ssh_usr = station["ssh_user"]
     ssh_password = station["ssh_password"]
-    # Get transfer params
-    data_rate = get_random_data_rate()
-    _file = select_random_file(files_path)
+    throughput_increment = station["throughput_increment_in_kbps"]
+    transfer_nb_per_step = station["transfer_nb_per_step"]
+    initial_data_rate = station["initial_data_rate_in_kbps"]
+    if throughput_increment is None:
+        data_rate = initial_data_rate
+        _file = select_random_file(files_path)
+    else:
+        data_rate = initial_data_rate + (throughput_increment * int(transfer_number / transfer_nb_per_step))
+        _file = get_iteration_file(files_path,transfer_number, transfer_nb_per_step)
 
     # Log start of transfer
     _log_line = f"Sending file {_file} to {station_ip} rate: {data_rate} kbps "
@@ -97,10 +101,17 @@ def send_file_to_station(station, files_path: str):
 
     # Run SCP file transfer
     scp_command = (
-        f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:Documents"
+        f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/"
     )
     os.system(scp_command)
     sleep(0.2)
+    logger.info("File sent")
+    scp_command_rm = (
+        f"sshpass -p '{ssh_password}' ssh {ssh_usr}@{station_ip} rm -r /home/{ssh_usr}/files_transfer/*"
+    )
+    os.system(scp_command_rm)
+    sleep(0.2)
+    logger.info("File removed")
 
 
 def get_test_params(config_file: str):
@@ -140,7 +151,7 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
 
     for station in stations_dict:
         file_sender = FilesSender(
-            interval=station["send_interval"],
+            interval=station["send_interval_in_secs"],
             duration=analysis_duration_in_minutes,
             function=send_file_to_station,
             args=(station, files_path),
@@ -154,6 +165,7 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
         time.sleep(60)
         now = datetime.now()
 
+    logger.info(f"script END, killing active threads")
     # Kill threads
     for file_sender in file_senders:
         file_sender.finished.set()

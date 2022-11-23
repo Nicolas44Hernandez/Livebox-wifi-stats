@@ -1,14 +1,11 @@
 
-FILES_PATH: /home/nicolas/workspace/Livebox-wifi-stats/files_to_send/
+FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
-  - name: RPI 1
-    ip: 192.168.1.12
-    ssh_user: nico
-    ssh_password: nico
-    send_interval: 30
-  - name: RPI 2
+  - name: E4:5F:01:1E:0A:34
     ip: 192.168.1.13
     ssh_user: nico
     ssh_password: nico
-    send_interval: 30
-
+    initial_data_rate_in_kbps: 500
+    throughput_increment_in_kbps: 1000
+    transfer_nb_per_step: 3
+    send_interval_in_secs: 0.01

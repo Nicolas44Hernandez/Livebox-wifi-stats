@@ -8,22 +8,53 @@ import logging
 logger = logging.getLogger(__name__)
 
 FILE_NAME = "random_file"
+
 FILES_SIZE_IN_BYTES = [
-      5000000,  #   5 MB
-     10000000,  #  10 MB
-     50000000,  #  50 MB
-     75000000,  #  75 MB
-    100000000,  # 100 MB
-    150000000,  # 150 MB
-    200000000,  # 200 MB
-    250000000,  # 250 MB
-    300000000,  # 300 MB
-    350000000,  # 350 MB
-    400000000,  # 400 MB
-    450000000,  # 450 MB
-    500000000,  # 500 MB
-    550000000,  # 550 MB
-    600000000,  # 600 MB
+    3750000,
+    6250000,
+    8750000,
+    11250000,
+    13750000,
+    16250000,
+    18750000,
+    21250000,
+    23750000,
+    26250000,
+    28750000,
+    31250000,
+    33750000,
+    36250000,
+    38750000,
+    41250000,
+    43750000,
+    46250000,
+    48750000,
+    51250000,
+    53750000,
+    56250000,
+    58750000,
+    61250000,
+    63750000,
+    66250000,
+    68750000,
+    71250000,
+    73750000,
+    76250000,
+    78750000,
+    81250000,
+    83750000,
+    86250000,
+    88750000,
+    91250000,
+    93750000,
+    96250000,
+    98750000,
+    101250000,
+    103750000,
+    106250000,
+    108750000,
+    111250000,
+    113750000,
 ]
 
 def generate_big_random_bin_file(filename,size):
@@ -44,7 +75,7 @@ def run_generate_random_files(files_path: str):
     logger.info("RUNNING PROGRAM: generate random files")
 
     for i, size in enumerate(FILES_SIZE_IN_BYTES):
-        filename = f"{files_path}/{FILE_NAME}{i}.txt"
+        filename = f"{files_path}/{FILE_NAME}{i + 1}.txt"
         generate_big_random_bin_file(filename, size)
         logger.info(f"file: {filename} size: {size}B  created")
 
