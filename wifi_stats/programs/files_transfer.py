@@ -1,5 +1,5 @@
 """
-Send files continuously to connected stations in order to create traffic in the network.
+Send files continuously to stations in order to create traffic in the network.
 """
 
 # Importation des librairies
@@ -16,8 +16,6 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-
-LIVEBOX_IP_ADDRESS = "192.168.1.1"
 
 class FilesSender(Thread):
     def __init__(
@@ -48,11 +46,14 @@ class FilesSender(Thread):
         if self.wait_first_time:
             self.finished.wait(self.interval)
             self.wait_first_time = True
-        # Increment curr_occurences if curr_occ < max_occ
+        self.kwargs["transfer_number"] = self.curr_occurrences -1
         if not self.finished.is_set():
-            self.function(*self.args, **self.kwargs)
+            logger.info(f"Iteration: {self.curr_occurrences}")
+            if self.curr_occurrences <= self.args[0]["transfer_nb_per_step"]:
+                time.sleep(20)
+            else:
+                self.function(*self.args, **self.kwargs)
             self.curr_occurrences += 1
-            logger.info(f"curr_occurrences incremented {self.curr_occurrences}")
         # Loops stops after max_occurrences
         if (
             self.curr_occurrences >= self.max_occurrences
@@ -61,19 +62,7 @@ class FilesSender(Thread):
             self.finished.set()
         else:
             # Run timer
-            logger.info(f"Recursion")
             self.run()
-
-
-def get_random_data_rate():
-    """
-    Select a random data rate from 1kbps to 400 Mbps that would be the max bitrate threshold
-    used when downloading a file.
-    """
-    return str(
-        randint(1, 400000)
-    )
-
 
 def select_random_file(files_path: str):
     """select a random file from the list."""
@@ -82,17 +71,29 @@ def select_random_file(files_path: str):
     selected_file = f"{files_path}{random.choice(files_list)}"
     return selected_file
 
+def get_iteration_file(files_path:str, iteration: int, transfers_per_step: int):
+    """Get file for iteration"""
+    file_numner = int(iteration / transfers_per_step)
+    selected_file = f"{files_path}random_file{file_numner}.txt"
+    return selected_file
 
-def send_file_to_station(station, files_path: str):
+
+def send_file_to_station(station, files_path: str, transfer_number: int):
     """Send a ramdom file with a random rate to a station over SCP"""
 
     # Get station params
     station_ip = station["ip"]
     ssh_usr = station["ssh_user"]
     ssh_password = station["ssh_password"]
-    # Get transfer params
-    data_rate = get_random_data_rate()
-    _file = select_random_file(files_path)
+    throughput_increment = station["throughput_increment_in_kbps"]
+    transfer_nb_per_step = station["transfer_nb_per_step"]
+    initial_data_rate = station["initial_data_rate_in_kbps"]
+    if throughput_increment is None:
+        data_rate = initial_data_rate
+        _file = select_random_file(files_path)
+    else:
+        data_rate = initial_data_rate + (throughput_increment * int(transfer_number / transfer_nb_per_step))
+        _file = get_iteration_file(files_path,transfer_number, transfer_nb_per_step)
 
     # Log start of transfer
     _log_line = f"Sending file {_file} to {station_ip} rate: {data_rate} kbps "

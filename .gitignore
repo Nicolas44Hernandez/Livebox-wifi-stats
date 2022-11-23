@@ -5,6 +5,9 @@ logs
 # random files to send
 files_to_send
 
+# random files to send
+historic_results
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

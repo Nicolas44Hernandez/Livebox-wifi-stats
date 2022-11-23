@@ -18,11 +18,11 @@ RESULTS_FILE_INFO_STATION =  "station_"
 
 COMMANDS = {
     "get header": "echo -e \"connected    2.4GHz    5GHz    datetime\"",
-    "check if 5GHz band is up": 'wl -i wl0 bss',
-    "check if 2.4GHz band is up": 'wl -i wl2 bss',
+    "check if 5GHz band is up": "echo -n 'EE''EE '; wl -i wl0 bss; echo 'FF''FF'",
+    "check if 2.4GHz band is up": "echo -n 'EE''EE '; wl -i wl2 bss; echo 'FF''FF'",
     "get stations MAC list 5GHz": "echo -n 'EE''EE '; wl -i wl0 assoclist | sed 's/assoclist //'; echo 'FF''FF'",
     "get stations MAC list 2.4GHz": "echo -n 'EE''EE '; wl -i wl2 assoclist | sed 's/assoclist //'; echo 'FF''FF'",
-    "get station info": "echo -n 'EE''EE '; wl sta_info MAC_ADDRESS; echo 'FF''FF'",
+    "get station info": "echo -n 'EE''EE '; wl -i BAND sta_info MAC_ADDRESS; echo 'FF''FF'",
     "check if file exists": "echo -n 'EE''EE '; test -f FILE && echo 'exists'; echo 'FF''FF'",
 }
 
@@ -45,8 +45,7 @@ def check_if_results_file_exists(telnet: Telnet, file: str):
     """Check if result file already exists"""
 
     check_if_file_exists_command = COMMANDS["check if file exists"].replace("FILE", file)
-    telnet.send_command(check_if_file_exists_command)
-    _result_brut = telnet.connection.read_until(b"FFFF").decode('ascii')
+    _result_brut = telnet.send_command_and_read_result(check_if_file_exists_command)
     result= str(parse_telnet_output(_result_brut))
     return "exists" in result
 
@@ -85,8 +84,13 @@ def write_single_station_info(
 
     # retrieve station info
     sta_info_command =  COMMANDS["get station info"].replace("MAC_ADDRESS", mac_addr)
-    telnet.send_command(sta_info_command)
-    station_info_result_brut = telnet.connection.read_until(b"FFFF").decode('ascii')
+    if wifi_band == "5GHz":
+        sta_info_command = sta_info_command.replace("BAND", "wl0")
+    elif wifi_band == "2.4GHz":
+        sta_info_command = sta_info_command.replace("BAND", "wl2")
+    else:
+        sta_info_command = sta_info_command.replace("BAND", "wl1")
+    station_info_result_brut = telnet.send_command_and_read_result(sta_info_command)
     _raw_station_info= str(parse_telnet_output(station_info_result_brut)).split("\r\n")[1:-1]
 
     # create entry
@@ -176,13 +180,11 @@ def get_connected_stations_in_band(telnet: Telnet, band: str):
     if band not in ["2.4GHz","5GHz"]:
         return []
 
-    telnet.send_command(COMMANDS["get stations MAC list " + band]) # # @MAC => # connected stations
-    mac_list_result_brut = telnet.connection.read_until(b"FFFF").decode('ascii')
+    mac_list_result_brut = telnet.send_command_and_read_result(COMMANDS["get stations MAC list " + band]) # # @MAC => # connected stations
     _raw_mac_list= str(parse_telnet_output(mac_list_result_brut))
     if len(_raw_mac_list) == 0:
         return []
     connected_stations = _raw_mac_list.split("\r\n")[:-1]
-    logger.info(f'Stations conected to band %s: %s', band, str(connected_stations))
     return connected_stations
 
 def get_connected_stations(telnet: Telnet):
@@ -194,7 +196,6 @@ def get_connected_stations(telnet: Telnet):
     if band_is_up(telnet, "5GHz"):
         connected_stations_5GHz = get_connected_stations_in_band(telnet, "5GHz")
     total_connections = len(connected_stations_2_4GHz) + len(connected_stations_5GHz)
-    logger.info(f"total_connections={total_connections}  2.4GHz:{connected_stations_2_4GHz}  5GHz:{connected_stations_5GHz}")
 
     return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
 
@@ -203,16 +204,10 @@ def band_is_up(telnet: Telnet, band: str):
     # Input check
     if band not in ["2.4GHz","5GHz"]:
         return False
-
-    # clean output
-    telnet.connection.read_very_eager()
-    # execute command
-    telnet.send_command(COMMANDS["check if " + band + " band is up"])
-    # get ret value
-    ret_val = telnet.connection.read_until(b"#").decode('ascii')
+    # get band status
+    ret_val_raw = telnet.send_command_and_read_result(COMMANDS["check if " + band + " band is up"])
+    ret_val = str(parse_telnet_output(ret_val_raw))
     band_is_up = not "down" in ret_val
-    # clean output
-    telnet.connection.read_very_eager()
     return band_is_up
 
 def run_info_connected_stations(

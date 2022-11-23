@@ -136,7 +136,6 @@ def main():
         type=str,
         help="External USB disk for analysis results",
     )
-
     # Parse args
     args = parser.parse_args()
 
@@ -155,12 +154,8 @@ def main():
         run_files_transfer(config_file=args.files_transfer_config, analysis_duration_in_minutes=args.duration)
         return
 
-    # Create telnet connection
+    # Create telnet instance
     telnet = Telnet(host=args.livebox, login=args.user, password=args.password)
-
-    if telnet.connection is None:
-        logger.error("Error creating telnet connection, check connection params")
-        return
 
     # Create results dir
     device = f"/var/usbmount/kernel::{args.results_disk}/"

@@ -15,7 +15,9 @@ RESULTS_FILE_5G =  "chanim_stats_5g.txt"
 COMMANDS = {
     "get header": 'export stats=$(wl -i wl0 chanim_stats | head -2); echo master_station_timestamp | (echo -n -e "$stats \t"  && cat)',
     "get stats 2.4GHz" : 'export stats=$(wl -i wl2 chanim_stats | tail -1); date -Iseconds | (echo -n -e "$stats \t"  && cat)',
-    "get stats 5GHz": 'export stats=$(wl -i wl0 chanim_stats | tail -1); date -Iseconds | (echo -n -e "$stats \t"  && cat)'
+    "get stats 5GHz": 'export stats=$(wl -i wl0 chanim_stats | tail -1); date -Iseconds | (echo -n -e "$stats \t"  && cat)',
+    "get stats 2.4GHz for log" : "echo -n 'EE''EE '; export stats=$(wl -i wl2 chanim_stats | tail -1); date -Iseconds | (echo -n -e \"$stats \t\"  && cat); echo 'FF''FF'",
+    "get stats 5GHz for log" : "echo -n 'EE''EE '; export stats=$(wl -i wl0 chanim_stats | tail -1); date -Iseconds | (echo -n -e \"$stats \t\"  && cat); echo 'FF''FF'",
 }
 
 
@@ -26,6 +28,10 @@ def add_ms_timestamp_to_command(original_command: str):
     new_command = splitted[0] + "-Iseconds; echo " + now + splitted[1]
     return new_command
 
+def parse_telnet_output(raw_output: str):
+    """Parse the output of the sent command"""
+    _splitted_patern = raw_output.split("EEEE")
+    return _splitted_patern[len(_splitted_patern) -1].split("FFFF")[0].lstrip()
 
 def run_chanim_stats(
     telnet: Telnet,
@@ -57,8 +63,11 @@ def run_chanim_stats(
     now = datetime.now()
     while now < estimated_end:
         next_sample_at = now + timedelta(seconds=sampling_period_in_seconds)
-        telnet.send_command(add_ms_timestamp_to_command(get_stats_2G_command))
-        telnet.send_command(add_ms_timestamp_to_command(get_stats_5G_command))
+        try:
+            telnet.send_command(add_ms_timestamp_to_command(get_stats_2G_command))
+            telnet.send_command(add_ms_timestamp_to_command(get_stats_5G_command))
+        except Exception as e:
+            logger.error(e)
         now = datetime.now()
 
         while now < next_sample_at:
