@@ -13,9 +13,9 @@ RESULTS_FILE_5GH_STATUS =  "band_status_5GHz.txt"
 COMMANDS = {
     "pcb command line interface": 'pcb_cli',
     "activate smart wifi": "SSW.Steering.GlobalEnable=1",
-    "activate band 2.4GHz": 'NeMo.Intf.rad2g0.Enable=1\n NeMo.Intf.rad2g0.AutoChannelEnable=0\n NeMo.Intf.rad2g0.Channel=11\n NeMo.Intf.rad5g0.Enable=0',
-    "activate band 5GHz": 'NeMo.Intf.rad5g0.Enable=1\n NeMo.Intf.rad5g0.AutoChannelEnable=0\n NeMo.Intf.rad5g0.Channel=36',
-    "desactivate band 5GHz": 'NeMo.Intf.rad5g0.Enable=0',
+    "activate band 2.4GHz": 'wl -i wl2 radio on',
+    "activate band 5GHz": 'wl -i wl0 radio on',
+    "desactivate band 5GHz": 'wl -i wl0 radio off',
 }
 
 def activate_smart_wifi(telnet: Telnet):

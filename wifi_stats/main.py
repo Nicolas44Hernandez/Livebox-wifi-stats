@@ -11,6 +11,7 @@ from programs.info_connected_stations import run_info_connected_stations
 from programs.switch_5GHz import run_switch_5GHz
 from programs.files_transfer import run_files_transfer
 from programs.generate_random_files import run_generate_random_files
+from programs.tx_rx_stats import run_tx_rx_stats
 
 USB_DEVICE_PATH = "/var/usbmount/kernel::"
 RESULTS_DIR = "wifi_stats_results"
@@ -27,9 +28,12 @@ def main():
         -l      --livebox                  Livebox ip address
         -u      --user                     Telnet connection user
         -pw     --password                 Telnet connection password
+        -s      --stations                 Number of connected stations
         -f      --files_path               Random files path
         -fc     --files_transfer_config    Config file for files transfer program
-        -sc    --stations_columns_config  Config file for the result table in info stations program
+        -ts     --timestamp                Analysis timestamp for results file
+        -sc     --stations_columns_config  Config file for the result table in info stations program
+        -ac     --antenas_columns_config   Config file for the result table in tx_rx_stats program
         -d      --duration                 Analysis duration
         -sp     --sampling_period_in_secs  Sampling period for information request
         -on     --on_period_in_secs        5GHz band ON period in secs
@@ -75,6 +79,13 @@ def main():
     )
 
     parser.add_argument(
+        "-s",
+        "--stations",
+        type=int,
+        help="Number of connected stations",
+    )
+
+    parser.add_argument(
         "-f",
         "--files_path",
         type=str,
@@ -89,10 +100,24 @@ def main():
     )
 
     parser.add_argument(
+        "-ts",
+        "--timestamp",
+        type=str,
+        help="Analysis timestamp for results file",
+    )
+
+    parser.add_argument(
         "-sc",
         "--stations_columns_config",
         type=str,
         help="Config file for the result table in info stations program",
+    )
+
+    parser.add_argument(
+        "-ac",
+        "--antenas_columns_config",
+        type=str,
+        help="Config file for the result table in tx_rx_stats program",
     )
 
     parser.add_argument(
@@ -141,14 +166,14 @@ def main():
 
     # Load logging configuration
     with open(args.logs_config) as stream:
-        dictConfig(yaml.load(stream))
+        dictConfig(yaml.full_load(stream))
 
     logger.info(f"Running program: {args.program}")
     logger.info(f"args: {args}")
 
     # Programs that dont need telnet connection
     if args.program == "generate_random_files":
-        run_generate_random_files(files_path=args.files_path)
+        run_generate_random_files(files_path=args.files_path, stations=args.stations)
         return
     if args.program == "files_transfer":
         run_files_transfer(config_file=args.files_transfer_config, analysis_duration_in_minutes=args.duration)
@@ -159,7 +184,7 @@ def main():
 
     # Create results dir
     device = f"/var/usbmount/kernel::{args.results_disk}/"
-    results_dir = telnet.create_results_dir(device=device, results_directory=RESULTS_DIR, box_name = args.name)
+    results_dir = telnet.create_results_dir(timestamp=args.timestamp, device=device, results_directory=RESULTS_DIR, box_name = args.name)
 
     # Run program
     if args.program == "static_livebox_data":
@@ -191,6 +216,16 @@ def main():
             columns_config_file=args.stations_columns_config,
         )
         return
+    if args.program == "antenas":
+        run_tx_rx_stats(
+            telnet=telnet,
+            results_dir=results_dir,
+            analysis_duration_in_minutes=args.duration,
+            sampling_period_in_seconds=args.sampling_period_in_secs,
+            columns_config_file=args.antenas_columns_config,
+        )
+        return
 
 if __name__ == "__main__":
     main()
+

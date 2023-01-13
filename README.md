@@ -10,6 +10,7 @@ This program aims to generate Wi-Fi statistics of the Livebox and the connected 
 | Transfer files             | Transfer random files to connected stations                                          |
 | Info connected stations    | Get information of the stations connected to the WiFi network                        |
 | Chanim stats               | Collect shanim stats from the Livebox WiFi bands                                     |
+| Antenas stats              | Collect Tx and Rx stats from the Livebox WiFi bands                                  |
 
 ## SETUP
 
@@ -56,6 +57,7 @@ This can be done from the file `wifi_stats/config/variables.env`
 | LIVEBOX_USER | Telnet user to connect to LB | root |
 | LIVEBOX_PASSWORD | Telnet password to connect to LB | sah |
 | ANALYSIS_DURATION_IN_MINUTES | Analysis total duration in minutes | 60 |
+| SWITCH_5GHZ_BAND | Activate switch band 5GHZ | true |
 | WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS | Time ON of the 5GHz band | 40 |
 | WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS | Time OFF of the 5GHz band | 30 |
 | SAMPLING_PERIOD_IN_SECS | Results sample period| 4 |
@@ -63,7 +65,9 @@ This can be done from the file `wifi_stats/config/variables.env`
 | FILES_TRASNSFER_CONFIG | Files transfer configuration files | workspace/Livebox-wifi-stats/wifi_stats/config/stations.yml |
 | LOGGING_CONFIG_FILE | Logging configuration file | workspace/Livebox-wifi-stats/wifi_stats/config/logging.yml |
 | CONNECTED_STATIONS_RESULTS_CONFIG | Connected stations results config file | workspace/Livebox-wifi-stats/wifi_stats/config/stations_info_config.yml |
+| ANTENAS_RESULTS_CONFIG | Antenas stats results config file | workspace/Livebox-wifi-stats/wifi_stats/config/antenas_tx_rx_config.yml |
 | USB_RESULTS_DEVICE | USB drive to store the results in the livebox | dev-sda1 |
+| SMOKEPING_CONFIG | Smokeping configuration | workspace/Livebox-wifi-stats/wifi_stats/config/Targets |
 
 ### Files transfer configuration
 
@@ -130,6 +134,7 @@ Log files:
 - main.log
 - static_data.log
 - switch_band.log
+- antenas_tx_rx_stats.log
 - telnet.log
 
 ## RESULTS FILES
@@ -142,12 +147,14 @@ The following result files are generated and saved to the usb drive:
 - info_station{n}.txt
 - static_data.txt
 - band_status_5GHz
+- tx_rx_2g_stats.txt
+- tx_rx_5g_stats.txt
 
 ## TODO LIST
 
 General:
 
-- [ ] New results file with measurements of Tx and Rx per antenna (command wl -i wl2 counters )
+- [X] New results file with measurements of Tx and Rx per antenna (command wl -i wl2 counters )
 
 Script Files Transfer:
 

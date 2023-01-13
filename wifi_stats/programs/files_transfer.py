@@ -101,17 +101,17 @@ def send_file_to_station(station, files_path: str, transfer_number: int):
 
     # Run SCP file transfer
     scp_command = (
-        f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/"
+        f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
     )
     os.system(scp_command)
-    sleep(0.2)
+    # sleep(0.2)
     logger.info("File sent")
-    scp_command_rm = (
-        f"sshpass -p '{ssh_password}' ssh {ssh_usr}@{station_ip} rm -r /home/{ssh_usr}/files_transfer/*"
-    )
-    os.system(scp_command_rm)
-    sleep(0.2)
-    logger.info("File removed")
+    # scp_command_rm = (
+    #     f"sshpass -p '{ssh_password}' ssh {ssh_usr}@{station_ip} rm -r /home/{ssh_usr}/files_transfer/*"
+    # )
+    # os.system(scp_command_rm)
+    # sleep(0.2)
+    # logger.info("File removed")
 
 
 def get_test_params(config_file: str):

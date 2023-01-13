@@ -1,0 +1,7 @@
+*** Probes ***
+
++ FPing
+
+binary = /usr/bin/fping
+timeout = 2
+hostinterval = 0.02

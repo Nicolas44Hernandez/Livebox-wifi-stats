@@ -78,14 +78,13 @@ class Telnet:
             logger.error(f"Error in telnet connection {e}")
 
 
-    def create_results_dir(self, device: str, results_directory: str, box_name: str):
+    def create_results_dir(self, timestamp:str, device: str, results_directory: str, box_name: str):
         """
         Create a clean dir for telnet results, if directory exists files will be overwritten
         """
 
-        timestamp=str(int(datetime.now().timestamp()))
         box_directory = results_directory + "/" + box_name
-        analysis_results_directory = box_directory + "/" + str(date.today()) + "-" + timestamp
+        analysis_results_directory = box_directory + "/" + timestamp
         create_dir_command = "mkdir " + device + results_directory + "\n"
         create_box_dir_command = "mkdir " + device + box_directory + "\n"
         create_analysis_dir_command = "mkdir " + device + analysis_results_directory + "\n"

@@ -5,7 +5,7 @@ STATIONS:
     ip: 192.168.1.13
     ssh_user: nico
     ssh_password: nico
-    initial_data_rate_in_kbps: 500
+    initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 1000
-    transfer_nb_per_step: 3
+    transfer_nb_per_step: 1
     send_interval_in_secs: 0.01

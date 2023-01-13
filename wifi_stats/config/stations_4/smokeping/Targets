@@ -1,0 +1,32 @@
+*** Targets ***
+
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = Welcome to the SmokePing website of xxx Company. \
+         Here you will learn all about the latency of our network.
+
++ SmokePing_E4_5F_01_1E_0A_34
+
+menu = SmokePing_E4_5F_01_1E_0A_34
+title = SmokePing_E4_5F_01_1E_0A_34
+host = 192.168.1.13
+
++ SmokePing_E4_5F_01_1E_0A_46
+
+menu = SmokePing_E4_5F_01_1E_0A_46
+title = SmokePing_E4_5F_01_1E_0A_46
+host = 192.168.1.12
+
++ SmokePing_E4_5F_01_1E_0A_6A
+
+menu = SmokePing_E4_5F_01_1E_0A_6A
+title = SmokePing_E4_5F_01_1E_0A_6A
+host = 192.168.1.16
+
++ SmokePing_B8_27_EB_8C_52_D2
+
+menu = SmokePing_B8_27_EB_8C_52_D2
+title = SmokePing_B8_27_EB_8C_52_D2
+host = 192.168.1.15

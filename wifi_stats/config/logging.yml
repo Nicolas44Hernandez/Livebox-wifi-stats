@@ -59,6 +59,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
+  antenas_tx_rx_stats:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/antenas_tx_rx_stats.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
   telnet:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -79,6 +86,11 @@ loggers:
   programs.chanim_stats:
     level: DEBUG
     handlers: [chanim_stats]
+    propagate: no
+
+  programs.tx_rx_stats:
+    level: DEBUG
+    handlers: [antenas_tx_rx_stats]
     propagate: no
 
   programs.files_transfer:
