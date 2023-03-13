@@ -3,17 +3,19 @@ FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
   - name: E4:5F:01:1E:0A:34
     ip: 192.168.1.13
-    ssh_user: nico
-    ssh_password: nico
-    initial_data_rate_in_kbps: 0
-    throughput_increment_in_kbps: 500
-    transfer_nb_per_step: 1
-    send_interval_in_secs: 0.01
-  - name: E4:5F:01:1E:0A:46
-    ip: 192.168.1.12
     ssh_user: pi
     ssh_password: pi
     initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 500
+    initial_dead_time_in_secs: 20
+    transfer_nb_per_step: 1
+    send_interval_in_secs: 0.01
+  - name: E4:5F:01:1E:0A:46
+    ip: 192.168.1.18
+    ssh_user: pi
+    ssh_password: pi
+    initial_data_rate_in_kbps: 0
+    throughput_increment_in_kbps: 500
+    initial_dead_time_in_secs: 20
     transfer_nb_per_step: 1
     send_interval_in_secs: 0.01
