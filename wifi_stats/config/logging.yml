@@ -38,6 +38,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
+  initial_files_transfer:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/initial_files_transfer_to_stations.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
   info_stations:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -95,7 +102,12 @@ loggers:
 
   programs.files_transfer:
     level: DEBUG
-    handlers: [files_transfer]
+    handlers: [console]
+    propagate: no
+
+  programs.initial_transfer_files_to_stations:
+    level: DEBUG
+    handlers: [console]
     propagate: no
 
   programs.generate_random_files:

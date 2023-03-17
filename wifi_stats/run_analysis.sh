@@ -2,7 +2,6 @@
 
 declare -a LOG_FILES=("chanim_stats.log"
                       "files_transfer.log"
-                      "generate_ramdom_files.log"
                       "info_stations.log"
                       "main.log"
                       "static_data.log"

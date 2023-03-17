@@ -10,6 +10,7 @@ from programs.static_data import run_static_data
 from programs.info_connected_stations import run_info_connected_stations
 from programs.switch_5GHz import run_switch_5GHz
 from programs.files_transfer import run_files_transfer
+from programs.initial_transfer_files_to_stations import run_initial_files_transfer_to_stations
 from programs.generate_random_files import run_generate_random_files
 from programs.tx_rx_stats import run_tx_rx_stats
 
@@ -18,6 +19,7 @@ RESULTS_DIR = "wifi_stats_results"
 
 
 logger = logging.getLogger(__name__)
+
 
 def main():
     """
@@ -173,10 +175,17 @@ def main():
 
     # Programs that dont need telnet connection
     if args.program == "generate_random_files":
-        run_generate_random_files(files_path=args.files_path, stations=args.stations)
+        run_generate_random_files(
+            files_path=args.files_path, stations=args.stations)
         return
     if args.program == "files_transfer":
-        run_files_transfer(config_file=args.files_transfer_config, analysis_duration_in_minutes=args.duration)
+        run_files_transfer(config_file=args.files_transfer_config,
+                           analysis_duration_in_minutes=args.duration)
+        return
+
+    if args.program == "initial_files_transfer_to_stations":
+        run_initial_files_transfer_to_stations(
+            config_file=args.files_transfer_config)
         return
 
     # Create telnet instance
@@ -184,7 +193,8 @@ def main():
 
     # Create results dir
     device = f"/var/usbmount/kernel::{args.results_disk}/"
-    results_dir = telnet.create_results_dir(timestamp=args.timestamp, device=device, results_directory=RESULTS_DIR, box_name = args.name)
+    results_dir = telnet.create_results_dir(
+        timestamp=args.timestamp, device=device, results_directory=RESULTS_DIR, box_name=args.name)
 
     # Run program
     if args.program == "static_livebox_data":
@@ -226,6 +236,6 @@ def main():
         )
         return
 
+
 if __name__ == "__main__":
     main()
-

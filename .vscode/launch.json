@@ -180,13 +180,28 @@
                 "-p",
                 "files_transfer",
                 "-fc",
-                "${workspaceFolder}/wifi_stats/config/stations.yml",
+                "${workspaceFolder}/wifi_stats/config/stations_2/stations.yml",
                 "-d",
                 "6",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
                 "-rd",
                 "dev-sda1",
+            ]
+        },
+        {
+            "name": "WiFI STATS: initial files transfer to stations",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/main.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-p",
+                "initial_files_transfer_to_stations",
+                "-fc",
+                "${workspaceFolder}/wifi_stats/config/stations_1/stations.yml",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]
         },
     ]

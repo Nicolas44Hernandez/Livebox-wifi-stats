@@ -10,8 +10,11 @@ import yaml
 from datetime import datetime
 import logging
 import time
+import subprocess
+import pexpect
 
 logger = logging.getLogger(__name__)
+
 
 class FilesSender(Thread):
     def __init__(
@@ -42,7 +45,7 @@ class FilesSender(Thread):
         if self.wait_first_time:
             self.finished.wait(self.interval)
             self.wait_first_time = True
-        self.kwargs["transfer_number"] = self.curr_occurrences -1
+        self.kwargs["transfer_number"] = self.curr_occurrences - 1
         if not self.finished.is_set():
             initial_dead_time = self.args[0]["initial_dead_time_in_secs"]
             if self.curr_occurrences < self.args[0]["transfer_nb_per_step"]:
@@ -61,6 +64,7 @@ class FilesSender(Thread):
             # Run timer
             self.run()
 
+
 def select_random_file(files_path: str):
     """select a random file from the list."""
 
@@ -68,7 +72,8 @@ def select_random_file(files_path: str):
     selected_file = f"{files_path}{random.choice(files_list)}"
     return selected_file
 
-def get_iteration_file(files_path:str, iteration: int, transfers_per_step: int):
+
+def get_iteration_file(files_path: str, iteration: int, transfers_per_step: int):
     """Get file for iteration"""
     file_numner = int(iteration / transfers_per_step)
     selected_file = f"{files_path}random_file{file_numner}.txt"
@@ -82,6 +87,8 @@ def send_file_to_station(station, files_path: str, transfer_number: int):
     station_ip = station["ip"]
     ssh_usr = station["ssh_user"]
     ssh_password = station["ssh_password"]
+    transfer_protocol = station["protocol"]
+    port = station["port"]
     throughput_increment = station["throughput_increment_in_kbps"]
     transfer_nb_per_step = station["transfer_nb_per_step"]
     initial_data_rate = station["initial_data_rate_in_kbps"]
@@ -89,28 +96,42 @@ def send_file_to_station(station, files_path: str, transfer_number: int):
         data_rate = initial_data_rate
         _file = select_random_file(files_path)
     else:
-        data_rate = initial_data_rate + (throughput_increment * int(transfer_number / transfer_nb_per_step))
-        _file = get_iteration_file(files_path,transfer_number, transfer_nb_per_step)
+        data_rate = initial_data_rate + \
+            (throughput_increment * int(transfer_number / transfer_nb_per_step))
+        _file = get_iteration_file(
+            files_path, transfer_number, transfer_nb_per_step)
 
     if os.path.exists(_file):
         # Log start of transfer
         logger.info(f"Iteration: {transfer_number}")
-        _log_line = f"Sending file {_file} to {station_ip} rate: {data_rate} kbps "
-        logger.info(_log_line)
+        if transfer_protocol == "scp":
+            # SCP send file
+            command = (
+                f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
+            )
+            # Run command
+            _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
+            logger.info(_log_line)
+            os.system(command)
 
-        # Run SCP file transfer
-        scp_command = (
-            f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
-        )
-        os.system(scp_command)
-        # sleep(0.2)
+        elif transfer_protocol == "sftp":
+            # SCTP file transfer to station
+            cmd1 = (
+                f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/file.txt"
+            )
+            child = pexpect.spawn(cmd1)
+            logger.info(f"SFTP connection stablished")
+            _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
+            logger.info(_log_line)
+
+            child.expect("sftp> ", timeout=1)
+            cmd2 = f"put {_file}"
+            child.sendline(cmd2)
+            child.expect("sftp> ")
+            child.sendline("exit")
+            child.close()
+
         logger.info("File sent")
-        # scp_command_rm = (
-        #     f"sshpass -p '{ssh_password}' ssh {ssh_usr}@{station_ip} rm -r /home/{ssh_usr}/files_transfer/*"
-        # )
-        # os.system(scp_command_rm)
-        # sleep(0.2)
-        # logger.info("File removed")
 
 
 def get_test_params(config_file: str):
@@ -127,7 +148,6 @@ def get_test_params(config_file: str):
             parsed_yaml = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             logger.error(exc)
-
 
     # Extract data
     stations_dict = parsed_yaml["STATIONS"]
@@ -146,7 +166,7 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
 
     stations_dict, files_path = get_test_params(config_file=config_file)
 
-    file_senders  = []
+    file_senders = []
 
     for station in stations_dict:
         file_sender = FilesSender(

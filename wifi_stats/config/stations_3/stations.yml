@@ -1,31 +1,39 @@
 
-FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
+FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/st_3/
 STATIONS:
-  - name: E4:5F:01:1E:0A:34
-    ip: 192.168.1.13
-    ssh_user: pi
-    ssh_password: pi
+  - name: Android Phone 1
+    ip: 192.168.1.35
+    ssh_user: nico
+    ssh_password: nico
+    protocol: sftp
+    operative_system: Android
+    port: 2233
     initial_data_rate_in_kbps: 0
-    throughput_increment_in_kbps: 334
-    initial_dead_time_in_secs: 20
+    throughput_increment_in_kbps: 500
+    initial_dead_time_in_secs: 10
     transfer_nb_per_step: 1
     send_interval_in_secs: 0.01
-  - name: E4:5F:01:1E:0A:46
+  - name: PC1_Wigreen
+    ip: 192.168.1.25
+    ssh_user: pc1_w
+    ssh_password: Wigreen1234
+    protocol: scp
+    operative_system: Windows
+    port: 22
+    initial_data_rate_in_kbps: 0
+    throughput_increment_in_kbps: 500
+    initial_dead_time_in_secs: 10
+    transfer_nb_per_step: 1
+    send_interval_in_secs: 5
+  - name: RPI_E4_5F_01_1E_0A_34
     ip: 192.168.1.18
-    ssh_user: pi
-    ssh_password: pi
+    ssh_user: nico
+    ssh_password: nico
+    protocol: scp
+    operative_system: Linux
+    port: 22
     initial_data_rate_in_kbps: 0
-    throughput_increment_in_kbps: 333
-    initial_dead_time_in_secs: 20
+    throughput_increment_in_kbps: 500
+    initial_dead_time_in_secs: 10
     transfer_nb_per_step: 1
-    send_interval_in_secs: 0.01
-  - name: E4:5F:01:1E:0A:6A
-    ip: 192.168.1.16
-    ssh_user: pi
-    ssh_password: pi
-    initial_data_rate_in_kbps: 0
-    throughput_increment_in_kbps: 333
-    initial_dead_time_in_secs: 20
-    transfer_nb_per_step: 1
-    send_interval_in_secs: 0.01
-
+    send_interval_in_secs: 5
