@@ -134,23 +134,28 @@ def transfer_file(station, files_path: str, transfer_from_station: bool, transfe
             cmd_connect = (
                 f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/"
             )
-            child = pexpect.spawn(cmd_connect)
-            logger.info(f"SFTP connection stablished")
+            try:
+                child = pexpect.spawn(cmd_connect)
+                logger.info(f"SFTP connection stablished")
 
-            child.expect("sftp> ", timeout=1)
-            if transfer_from_station:
-                file_to_get = _file.split("/")[-2] + "/" + _file.split("/")[-1]
-                _log_line = f"Retreiving file {file_to_get} from {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
-                logger.info(_log_line)
-                cmd = f"get {file_to_get} file_{station_name}.txt"
-            else:
-                _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
-                logger.info(_log_line)
-                cmd = f"put {_file} file.txt"
-            child.sendline(cmd)
-            child.expect("sftp> ")
-            child.sendline("exit")
-            child.close()
+                child.expect("sftp> ", timeout=1)
+                if transfer_from_station:
+                    file_to_get = _file.split(
+                        "/")[-2] + "/" + _file.split("/")[-1]
+                    _log_line = f"Retreiving file {file_to_get} from {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
+                    logger.info(_log_line)
+                    cmd = f"get {file_to_get} file_{station_name}.txt"
+                else:
+                    _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
+                    logger.info(_log_line)
+                    cmd = f"put {_file} file.txt"
+                child.sendline(cmd)
+                child.expect("sftp> ")
+                child.sendline("exit")
+                child.close()
+            except:
+                logger.error("Error in transfer")
+                child.close()
 
         logger.info("File transfer done")
 

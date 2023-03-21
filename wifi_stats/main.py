@@ -44,6 +44,7 @@ def main():
         -rd     --results_disk             External USB disk for analysis results
         -st     --steps                    Total steps for files generation
         -sd     --step_duration            Step duration
+        -ti     --trafic_increment         Trafic increment per step
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
@@ -94,6 +95,13 @@ def main():
         type=int,
         help="Duration of a transfer in secs",
     )
+    parser.add_argument(
+        "-ti",
+        "--trafic_increment",
+        type=int,
+        help="Trafic increment per step^in MB",
+    )
+
     parser.add_argument(
         "-s",
         "--stations",
@@ -193,7 +201,8 @@ def main():
             files_path=args.files_path,
             stations=args.stations,
             total_steps=args.steps,
-            seconds_per_step=args.step_duration
+            seconds_per_step=args.step_duration,
+            trafic_increment_per_step_in_MB=args.trafic_increment
         )
         return
     if args.program == "files_transfer":
