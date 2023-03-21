@@ -12,9 +12,9 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-RESULTS_FILE_CONNECTIONS_NUMBER =  "connections_number.txt"
+RESULTS_FILE_CONNECTIONS_NUMBER = "connections_number.txt"
 # File name will be completed with the station number info_station{i}.txt
-RESULTS_FILE_INFO_STATION =  "station_"
+RESULTS_FILE_INFO_STATION = "station_"
 
 COMMANDS = {
     "get header": "echo -e \"connected    2.4GHz    5GHz    datetime\"",
@@ -25,6 +25,7 @@ COMMANDS = {
     "get station info": "echo -n 'EE''EE '; wl -i BAND sta_info MAC_ADDRESS; echo 'FF''FF'",
     "check if file exists": "echo -n 'EE''EE '; test -f FILE && echo 'exists'; echo 'FF''FF'",
 }
+
 
 def get_columns(config_file: str):
     """Get results file columns from config file"""
@@ -41,13 +42,17 @@ def get_columns(config_file: str):
 
     return columns
 
+
 def check_if_results_file_exists(telnet: Telnet, file: str):
     """Check if result file already exists"""
 
-    check_if_file_exists_command = COMMANDS["check if file exists"].replace("FILE", file)
-    _result_brut = telnet.send_command_and_read_result(check_if_file_exists_command)
-    result= str(parse_telnet_output(_result_brut))
+    check_if_file_exists_command = COMMANDS["check if file exists"].replace(
+        "FILE", file)
+    _result_brut = telnet.send_command_and_read_result(
+        check_if_file_exists_command)
+    result = str(parse_telnet_output(_result_brut))
     return "exists" in result
+
 
 def write_single_station_info(
     telnet: Telnet,
@@ -55,9 +60,8 @@ def write_single_station_info(
     mac_addr: str,
     wifi_band: str,
     date_time: str,
-    results_dir:str
-    ):
-
+    results_dir: str
+):
     """
     Append station info to dedicated result file, if the file doenst exists creates a file with the headers
     """
@@ -83,15 +87,18 @@ def write_single_station_info(
         telnet.send_command(write_header_command)
 
     # retrieve station info
-    sta_info_command =  COMMANDS["get station info"].replace("MAC_ADDRESS", mac_addr)
+    sta_info_command = COMMANDS["get station info"].replace(
+        "MAC_ADDRESS", mac_addr)
     if wifi_band == "5GHz":
         sta_info_command = sta_info_command.replace("BAND", "wl0")
     elif wifi_band == "2.4GHz":
         sta_info_command = sta_info_command.replace("BAND", "wl2")
     else:
         sta_info_command = sta_info_command.replace("BAND", "wl1")
-    station_info_result_brut = telnet.send_command_and_read_result(sta_info_command)
-    _raw_station_info= str(parse_telnet_output(station_info_result_brut)).split("\r\n")[1:-1]
+    station_info_result_brut = telnet.send_command_and_read_result(
+        sta_info_command)
+    _raw_station_info = str(parse_telnet_output(
+        station_info_result_brut)).split("\r\n")[1:-1]
 
     # create entry
     new_entry = ""
@@ -99,6 +106,8 @@ def write_single_station_info(
         for line in _raw_station_info:
             if col in line:
                 value = line.split(col)[1][1:].replace("= ", "")
+                if "smoothed" in col:
+                    logger.info(f"smoothed rssi: {value}")
                 if i != 0:
                     new_entry += "    "
                 new_entry += f"{value}"
@@ -113,13 +122,14 @@ def write_single_station_info(
     write_stations_info_command = f"echo -e \"{new_entry}\" {output_redirection_command}"
     telnet.send_command(write_stations_info_command)
 
+
 def write_stations_info_in_file(
     telnet: Telnet,
     results_dir: str,
     connections_2_4GHz: int,
     connections_5GHz: int,
     columns_conf: str,
-    ):
+):
     """Loop over connected stations and write stats in results files"""
 
     date_time = str(datetime.now())
@@ -144,23 +154,24 @@ def write_stations_info_in_file(
             results_dir=results_dir
         )
 
+
 def write_nb_connections_in_file(
     telnet: Telnet,
     results_dir: str,
     connections_number: int,
     connections_2_4GHz: int,
     connections_5GHz: int
-    ):
+):
     """
     Write the number of connected stations for each band in the dedicated results file
     """
 
     # redirection to file command
-    output_redirection_command = " >> " + results_dir + "/" + RESULTS_FILE_CONNECTIONS_NUMBER
+    output_redirection_command = " >> " + results_dir + \
+        "/" + RESULTS_FILE_CONNECTIONS_NUMBER
 
     # Write connected stations command
     date_time = str(datetime.now())
-
 
     # create entry
     new_entry = f"{connections_number}    {connections_5GHz}    {connections_2_4GHz}    {date_time}"
@@ -169,50 +180,60 @@ def write_nb_connections_in_file(
     # Send command
     telnet.send_command(write_connected_stations_command)
 
+
 def parse_telnet_output(raw_output: str):
     """Parse the output of the sent command"""
     _splitted_patern = raw_output.split("EEEE")
-    return _splitted_patern[len(_splitted_patern) -1].split("FFFF")[0].lstrip()
+    return _splitted_patern[len(_splitted_patern) - 1].split("FFFF")[0].lstrip()
+
 
 def get_connected_stations_in_band(telnet: Telnet, band: str):
     """Returns the MAC list of stations connected to the band WiFi"""
     # Input check
-    if band not in ["2.4GHz","5GHz"]:
+    if band not in ["2.4GHz", "5GHz"]:
         return []
 
-    mac_list_result_brut = telnet.send_command_and_read_result(COMMANDS["get stations MAC list " + band]) # # @MAC => # connected stations
-    _raw_mac_list= str(parse_telnet_output(mac_list_result_brut))
+    mac_list_result_brut = telnet.send_command_and_read_result(
+        COMMANDS["get stations MAC list " + band])  # @MAC => # connected stations
+    _raw_mac_list = str(parse_telnet_output(mac_list_result_brut))
     if len(_raw_mac_list) == 0:
         return []
     connected_stations = _raw_mac_list.split("\r\n")[:-1]
     return connected_stations
 
+
 def get_connected_stations(telnet: Telnet):
     """Retrive the list of mac addresses of the stations connected to each frequency band"""
     # Get connected stations
-    connected_stations_5GHz= []
-    connected_stations_2_4GHz= get_connected_stations_in_band(telnet, "2.4GHz")
+    connected_stations_5GHz = []
+    connected_stations_2_4GHz = get_connected_stations_in_band(
+        telnet, "2.4GHz")
     # check if 5GHz band is up
     if band_is_up(telnet, "5GHz"):
-        connected_stations_5GHz = get_connected_stations_in_band(telnet, "5GHz")
-    total_connections = len(connected_stations_2_4GHz) + len(connected_stations_5GHz)
+        connected_stations_5GHz = get_connected_stations_in_band(
+            telnet, "5GHz")
+    total_connections = len(connected_stations_2_4GHz) + \
+        len(connected_stations_5GHz)
 
     return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
+
 
 def band_is_up(telnet: Telnet, band: str):
     """Check if a frequency band is up or down"""
     # Input check
-    if band not in ["2.4GHz","5GHz"]:
+    if band not in ["2.4GHz", "5GHz"]:
         return False
     # get band status
-    ret_val_raw = telnet.send_command_and_read_result(COMMANDS["check if " + band + " band is up"])
+    ret_val_raw = telnet.send_command_and_read_result(
+        COMMANDS["check if " + band + " band is up"])
     ret_val = str(parse_telnet_output(ret_val_raw))
     band_is_up = not "down" in ret_val
     return band_is_up
 
+
 def run_info_connected_stations(
     telnet: Telnet,
-    results_dir:str,
+    results_dir: str,
     analysis_duration_in_minutes: int,
     sampling_period_in_seconds: int,
     columns_config_file: str
@@ -226,7 +247,8 @@ def run_info_connected_stations(
     logger.info(f"Estimated end: {str(estimated_end)}")
 
     # Write header
-    output_redirection_command = " >> " + results_dir + "/" + RESULTS_FILE_CONNECTIONS_NUMBER
+    output_redirection_command = " >> " + results_dir + \
+        "/" + RESULTS_FILE_CONNECTIONS_NUMBER
     write_header_command = COMMANDS['get header'] + output_redirection_command
     telnet.send_command(write_header_command)
 
@@ -236,8 +258,10 @@ def run_info_connected_stations(
         next_sample_at = now + timedelta(seconds=sampling_period_in_seconds)
 
         # Get number of connected stations
-        total_connections, connected_stations_2_4GHz, connected_stations_5GHz = get_connected_stations(telnet)
-        logger.info(f"Connected stations: {total_connections} 2.4GHz band: {connected_stations_2_4GHz} 5GHz band: {connected_stations_5GHz}")
+        total_connections, connected_stations_2_4GHz, connected_stations_5GHz = get_connected_stations(
+            telnet)
+        logger.info(
+            f"Connected stations: {total_connections} 2.4GHz band: {connected_stations_2_4GHz} 5GHz band: {connected_stations_5GHz}")
 
         # Write number of connections in dedicated file
         write_nb_connections_in_file(
@@ -247,7 +271,7 @@ def run_info_connected_stations(
             connections_2_4GHz=len(connected_stations_2_4GHz),
             connections_5GHz=len(connected_stations_5GHz),
         )
-        if total_connections > 0 :
+        if total_connections > 0:
             write_stations_info_in_file(
                 telnet=telnet,
                 results_dir=results_dir,
@@ -260,6 +284,3 @@ def run_info_connected_stations(
         while now < next_sample_at:
             time.sleep(0.1)
             now = datetime.now()
-
-
-

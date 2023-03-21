@@ -16,7 +16,7 @@ import pexpect
 logger = logging.getLogger(__name__)
 
 
-class FilesSender(Thread):
+class FilesTransferManager(Thread):
     def __init__(
         self, interval, duration, function, args=None, kwargs=None, wait_first_time=True
     ):
@@ -80,10 +80,11 @@ def get_iteration_file(files_path: str, iteration: int, transfers_per_step: int)
     return selected_file
 
 
-def send_file_to_station(station, files_path: str, transfer_number: int):
+def transfer_file(station, files_path: str, transfer_from_station: bool, transfer_number: int):
     """Send a ramdom file with a random rate to a station over SCP"""
 
     # Get station params
+    station_name = station["name"]
     station_ip = station["ip"]
     ssh_usr = station["ssh_user"]
     ssh_password = station["ssh_password"]
@@ -92,6 +93,7 @@ def send_file_to_station(station, files_path: str, transfer_number: int):
     throughput_increment = station["throughput_increment_in_kbps"]
     transfer_nb_per_step = station["transfer_nb_per_step"]
     initial_data_rate = station["initial_data_rate_in_kbps"]
+    operative_system = station["operative_system"]
     if throughput_increment is None:
         data_rate = initial_data_rate
         _file = select_random_file(files_path)
@@ -105,33 +107,52 @@ def send_file_to_station(station, files_path: str, transfer_number: int):
         # Log start of transfer
         logger.info(f"Iteration: {transfer_number}")
         if transfer_protocol == "scp":
-            # SCP send file
-            command = (
-                f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
-            )
+            # SCP transfer file
+            if transfer_from_station:
+                f = _file.split("/")[-1]
+                _log_line = f"Retreiving file {f} from {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}  os:{operative_system}"
+                logger.info(_log_line)
+                file_to_get = _file.split(
+                    "/")[-2] + "/" + _file.split("/")[-1]
+                command = (
+                    f"sshpass -p '{ssh_password}' scp -l {data_rate} {ssh_usr}@{station_ip}:files_transfer/{file_to_get} file_{station_name}.txt"
+                )
+            else:
+                _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol} os:{operative_system}"
+                logger.info(_log_line)
+                file_to_get = _file.split(
+                    "/")[-2] + "/" + _file.split("/")[-1]
+                command = (
+                    f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
+                )
             # Run command
-            _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
-            logger.info(_log_line)
+            # logger.info(f"command: {command}")
             os.system(command)
 
         elif transfer_protocol == "sftp":
-            # SCTP file transfer to station
-            cmd1 = (
-                f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/file.txt"
+            # SCTP file transfer
+            cmd_connect = (
+                f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/"
             )
-            child = pexpect.spawn(cmd1)
+            child = pexpect.spawn(cmd_connect)
             logger.info(f"SFTP connection stablished")
-            _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
-            logger.info(_log_line)
 
             child.expect("sftp> ", timeout=1)
-            cmd2 = f"put {_file}"
-            child.sendline(cmd2)
+            if transfer_from_station:
+                file_to_get = _file.split("/")[-2] + "/" + _file.split("/")[-1]
+                _log_line = f"Retreiving file {file_to_get} from {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
+                logger.info(_log_line)
+                cmd = f"get {file_to_get} file_{station_name}.txt"
+            else:
+                _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
+                logger.info(_log_line)
+                cmd = f"put {_file} file.txt"
+            child.sendline(cmd)
             child.expect("sftp> ")
             child.sendline("exit")
             child.close()
 
-        logger.info("File sent")
+        logger.info("File transfer done")
 
 
 def get_test_params(config_file: str):
@@ -166,17 +187,25 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
 
     stations_dict, files_path = get_test_params(config_file=config_file)
 
-    file_senders = []
+    file_transfer_workers = []
 
     for station in stations_dict:
-        file_sender = FilesSender(
+        file_transfer_to_station_worker = FilesTransferManager(
             interval=station["send_interval_in_secs"],
             duration=analysis_duration_in_minutes,
-            function=send_file_to_station,
-            args=(station, files_path),
+            function=transfer_file,
+            args=(station, files_path, False),
         )
-        file_sender.start()
-        file_senders.append(file_sender)
+        file_transfer_from_station_worker = FilesTransferManager(
+            interval=station["send_interval_in_secs"],
+            duration=analysis_duration_in_minutes,
+            function=transfer_file,
+            args=(station, files_path, True),
+        )
+        file_transfer_to_station_worker.start()
+        file_transfer_from_station_worker.start()
+        file_transfer_workers.append(file_transfer_to_station_worker)
+        file_transfer_workers.append(file_transfer_from_station_worker)
 
     # Waiting loop
     now = datetime.now()
@@ -186,6 +215,6 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
 
     logger.info(f"script END, killing active threads")
     # Kill threads
-    for file_sender in file_senders:
-        file_sender.finished.set()
+    for file_worker in file_transfer_workers:
+        file_worker.finished.set()
     return

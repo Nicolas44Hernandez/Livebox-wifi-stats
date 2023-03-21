@@ -7,8 +7,8 @@ title = Network Latency Grapher
 remark = Welcome to the SmokePing website of xxx Company. \
          Here you will learn all about the latency of our network.
 
-+ SmokePing_E4_5F_01_1E_0A_34
++ Android1_AC_BD_70_27_CA_19
 
-menu = SmokePing_E4_5F_01_1E_0A_34
-title = SmokePing_E4_5F_01_1E_0A_34
-host = 192.168.1.13
+menu = Android1_AC_BD_70_27_CA_19
+title = Android1_AC_BD_70_27_CA_19
+host = 192.168.1.12

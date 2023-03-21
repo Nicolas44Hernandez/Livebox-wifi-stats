@@ -37,6 +37,7 @@ echo ------------------------------
 # Create results files
 echo "Creating log files..."
 mkdir analyses_results
+rm -r logs
 mkdir logs
 mkdir analyses_results/$BOX_NAME
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP
@@ -70,17 +71,6 @@ if [ "$CONNECTED_STATIONS" -gt 0 ]; then
 fi
 
 echo  ------------------------------------------------
-# Generate random files
-if [ "$CONNECTED_STATIONS" -gt 0 ]; then
-    echo Running program: GENERATE RANDOM FILES
-    sudo rm -r -f $FILES_TO_SEND
-    sleep 1
-    mkdir $FILES_TO_SEND
-    echo Files to send in: $FILES_TO_SEND
-    python3 main.py -p generate_random_files -s $CONNECTED_STATIONS -f $FILES_TO_SEND -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE
-    sudo chmod -R 777 $FILES_TO_SEND
-fi
-
 # Run analysis programs
 echo  Running program: STATIC DATA
 python3 main.py -p static_livebox_data -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -ts $ANALYSIS_TIMESTAMP &
@@ -137,4 +127,3 @@ if [ "$CONNECTED_STATIONS" -gt 0 ]; then
     done
 fi
 echo "sudo chmod -R 777 analyses_results" | at now +$RESULTS_EXTRACTION_TIME minutes
-echo "rm -r -f $FILES_TO_SEND" | at now +$RESULTS_EXTRACTION_TIME minutes

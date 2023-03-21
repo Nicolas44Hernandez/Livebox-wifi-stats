@@ -102,12 +102,12 @@ loggers:
 
   programs.files_transfer:
     level: DEBUG
-    handlers: [console]
+    handlers: [files_transfer]
     propagate: no
 
   programs.initial_transfer_files_to_stations:
     level: DEBUG
-    handlers: [console]
+    handlers: [initial_files_transfer]
     propagate: no
 
   programs.generate_random_files:
