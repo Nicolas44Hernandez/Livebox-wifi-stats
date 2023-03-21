@@ -160,14 +160,16 @@
             "args": [
                 "-p",
                 "generate_random_files",
+                "-st",
+                "40",
+                "-sd",
+                "20",
                 "-s",
-                "2",
+                "4",
                 "-f",
                 "${workspaceFolder}/files_to_send",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sda1",
             ]
         },
         {

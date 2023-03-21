@@ -44,25 +44,27 @@ In addition, the following Python packages are required:
 
 Before launching the script it is necessary to configure the different input arguments of the different programs.
 This can be done from the file `wifi_stats/config/variables.env`
-| VARIABLE                          | WHAT IS?                                      | EXAMPLE                                                                 |
-| --------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------- |
-| LIVEBOX_IP_ADDR                   | IP Address of the Livebox                     | 192.168.1.1                                                             |
-| BOX_NAME                          | Name of the box (Only to results dir)         | liveboxNico                                                             |
-| LIVEBOX_USER                      | Telnet user to connect to LB                  | root                                                                    |
-| LIVEBOX_PASSWORD                  | Telnet password to connect to LB              | sah                                                                     |
-| ANALYSIS_DURATION_IN_MINUTES      | Analysis total duration in minutes            | 60                                                                      |
-| SWITCH_5GHZ_BAND                  | Activate switch band 5GHZ                     | true                                                                    |
-| WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS  | Time ON of the 5GHz band                      | 40                                                                      |
-| WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS | Time OFF of the 5GHz band                     | 30                                                                      |
-| SAMPLING_PERIOD_IN_SECS           | Results sample period                         | 4                                                                       |
-| FILES_TO_SEND                     | Directory of the files to send to stations    | workspace/Livebox-wifi-stats/files_to_send                              |
-| SETUP_FILES_TRASNSFER_CONFIG_DIR  | Files transfer configuration folder for setup | workspace/Livebox-wifi-stats/wifi_stats/config                          |
-| FILES_TRASNSFER_CONFIG            | Files transfer configuration files            | workspace/Livebox-wifi-stats/wifi_stats/config/stations.yml             |
-| LOGGING_CONFIG_FILE               | Logging configuration file                    | workspace/Livebox-wifi-stats/wifi_stats/config/logging.yml              |
-| CONNECTED_STATIONS_RESULTS_CONFIG | Connected stations results config file        | workspace/Livebox-wifi-stats/wifi_stats/config/stations_info_config.yml |
-| ANTENAS_RESULTS_CONFIG            | Antenas stats results config file             | workspace/Livebox-wifi-stats/wifi_stats/config/antenas_tx_rx_config.yml |
-| USB_RESULTS_DEVICE                | USB drive to store the results in the livebox | dev-sda1                                                                |
-| SMOKEPING_CONFIG                  | Smokeping configuration                       | workspace/Livebox-wifi-stats/wifi_stats/config/Targets                  |
+| VARIABLE                          | WHAT IS?                                       | EXAMPLE                                                                 |
+| --------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------- |
+| LIVEBOX_IP_ADDR                   | IP Address of the Livebox                      | 192.168.1.1                                                             |
+| BOX_NAME                          | Name of the box (Only to results dir)          | liveboxNico                                                             |
+| LIVEBOX_USER                      | Telnet user to connect to LB                   | root                                                                    |
+| LIVEBOX_PASSWORD                  | Telnet password to connect to LB               | sah                                                                     |
+| ANALYSIS_DURATION_IN_MINUTES      | Analysis total duration in minutes             | 60                                                                      |
+| TRANSFER_STEP_DURATION_IN_SECS    | File transfer duration (for files generation)  | 20                                                                      |
+| TOTAL_NUMBER_OF_FILES_TO_TRANSFER | Total files to transfer (for files generation) | 40                                                                      |
+| SWITCH_5GHZ_BAND                  | Activate switch band 5GHZ                      | true                                                                    |
+| WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS  | Time ON of the 5GHz band                       | 40                                                                      |
+| WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS | Time OFF of the 5GHz band                      | 30                                                                      |
+| SAMPLING_PERIOD_IN_SECS           | Results sample period                          | 4                                                                       |
+| FILES_TO_SEND                     | Directory of the files to send to stations     | workspace/Livebox-wifi-stats/files_to_send                              |
+| SETUP_FILES_TRASNSFER_CONFIG_DIR  | Files transfer configuration folder for setup  | workspace/Livebox-wifi-stats/wifi_stats/config                          |
+| FILES_TRASNSFER_CONFIG            | Files transfer configuration files             | workspace/Livebox-wifi-stats/wifi_stats/config/stations.yml             |
+| LOGGING_CONFIG_FILE               | Logging configuration file                     | workspace/Livebox-wifi-stats/wifi_stats/config/logging.yml              |
+| CONNECTED_STATIONS_RESULTS_CONFIG | Connected stations results config file         | workspace/Livebox-wifi-stats/wifi_stats/config/stations_info_config.yml |
+| ANTENAS_RESULTS_CONFIG            | Antenas stats results config file              | workspace/Livebox-wifi-stats/wifi_stats/config/antenas_tx_rx_config.yml |
+| USB_RESULTS_DEVICE                | USB drive to store the results in the livebox  | dev-sda1                                                                |
+| SMOKEPING_CONFIG                  | Smokeping configuration                        | workspace/Livebox-wifi-stats/wifi_stats/config/Targets                  |
 
 ### Files transfer configuration
 

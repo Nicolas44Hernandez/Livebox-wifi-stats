@@ -42,6 +42,8 @@ def main():
         -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
         -rd     --results_disk             External USB disk for analysis results
+        -st     --steps                    Total steps for files generation
+        -sd     --step_duration            Step duration
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
@@ -80,6 +82,18 @@ def main():
         help="Password",
     )
 
+    parser.add_argument(
+        "-st",
+        "--steps",
+        type=int,
+        help="Total steps for files generation",
+    )
+    parser.add_argument(
+        "-sd",
+        "--step_duration",
+        type=int,
+        help="Duration of a transfer in secs",
+    )
     parser.add_argument(
         "-s",
         "--stations",
@@ -176,7 +190,11 @@ def main():
     # Programs that dont need telnet connection
     if args.program == "generate_random_files":
         run_generate_random_files(
-            files_path=args.files_path, stations=args.stations)
+            files_path=args.files_path,
+            stations=args.stations,
+            total_steps=args.steps,
+            seconds_per_step=args.step_duration
+        )
         return
     if args.program == "files_transfer":
         run_files_transfer(config_file=args.files_transfer_config,
