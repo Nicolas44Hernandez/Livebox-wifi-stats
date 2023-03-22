@@ -110,9 +110,14 @@ loggers:
     handlers: [initial_files_transfer]
     propagate: no
 
+  programs.initial_calibrate_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   programs.generate_random_files:
     level: DEBUG
-    handlers: [generate_random_files]
+    handlers: [console]
     propagate: no
 
   programs.info_connected_stations:
