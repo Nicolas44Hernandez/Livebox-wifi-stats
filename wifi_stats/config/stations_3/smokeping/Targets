@@ -19,8 +19,8 @@ menu = PC1_Wigreen_78_AF_08_31_B1_18
 title = PC1_Wigreen_78_AF_08_31_B1_18
 host = 192.168.1.22
 
-+ RPI_E4_5F_01_1E_0A_34
++ RPI_E4_5F_01_E8_C1_2E
 
-menu = RPI_E4_5F_01_1E_0A_34
-title = RPI_E4_5F_01_1E_0A_34
-host = 192.168.1.13
+menu = RPI_E4_5F_01_E8_C1_2E
+title = RPI_E4_5F_01_E8_C1_2E
+host = 192.168.1.25
