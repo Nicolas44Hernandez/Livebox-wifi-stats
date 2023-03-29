@@ -61,7 +61,7 @@ if [ "$CONNECTED_STATIONS" -gt 0 ]; then
     echo  Launching Smokeping service
     sudo systemctl stop apache2 smokeping
     sleep 2
-    sudo rm -f /var/lib/smokeping/SmokePing_*
+    sudo rm -f /var/lib/smokeping/*.rrd
     sudo cp $SMOKEPING_CONFIG/Targets /etc/smokeping/config.d/Targets
     sudo cp $SMOKEPING_CONFIG/Database /etc/smokeping/config.d/Database
     sudo cp $SMOKEPING_CONFIG/Probes /etc/smokeping/config.d/Probes
