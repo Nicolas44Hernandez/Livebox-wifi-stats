@@ -136,7 +136,6 @@ def transfer_file(station, files_path: str, transfer_from_station: bool, transfe
             )
             try:
                 child = pexpect.spawn(cmd_connect)
-                logger.info(f"SFTP connection stablished")
 
                 child.expect("sftp> ", timeout=1)
                 if transfer_from_station:
@@ -153,7 +152,7 @@ def transfer_file(station, files_path: str, transfer_from_station: bool, transfe
                 child.expect("sftp> ")
                 child.sendline("exit")
                 child.close()
-            except:
+            except Exception as e:
                 logger.error("Error in transfer")
                 child.close()
 

@@ -27,8 +27,8 @@ STATIONS:
     send_interval_in_secs: 5
   - name: RPI_E4_5F_01_E8_C1_2E
     ip: 192.168.1.25
-    ssh_user: nico
-    ssh_password: nico
+    ssh_user: pi
+    ssh_password: pi
     protocol: scp
     operative_system: Linux
     port: 22
