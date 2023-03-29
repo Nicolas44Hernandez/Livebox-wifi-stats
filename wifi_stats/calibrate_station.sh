@@ -1,6 +1,20 @@
 #!/bin/bash
 
+
+declare -a LOG_FILES=("initial_calibrate_stations.log"
+                      "main.log"
+                      )
+
 source config/variables.env
+
+# Create setup log files
+mkdir logs
+for log_file in "${LOG_FILES[@]}"
+do
+    if ! test -f "logs/$log_file"; then
+        touch "logs/$log_file"
+    fi
+done
 
 # Print setup args
 echo ------------------------------
