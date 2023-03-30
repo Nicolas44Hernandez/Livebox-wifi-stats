@@ -180,7 +180,7 @@
                 "-p",
                 "files_transfer",
                 "-fc",
-                "${workspaceFolder}/wifi_stats/config/stations_4/stations.yml",
+                "${workspaceFolder}/wifi_stats/config/stations_1/stations.yml",
                 "-d",
                 "6",
                 "-lc",
