@@ -31,8 +31,6 @@ def main():
         -l      --livebox                  Livebox ip address
         -u      --user                     Telnet connection user
         -pw     --password                 Telnet connection password
-        -s      --stations                 Number of connected stations
-        -f      --files_path               Random files path
         -fc     --files_transfer_config    Config file for files transfer program
         -ts     --timestamp                Analysis timestamp for results file
         -sc     --stations_columns_config  Config file for the result table in info stations program
@@ -45,7 +43,6 @@ def main():
         -rd     --results_disk             External USB disk for analysis results
         -st     --steps                    Total steps for files generation
         -sd     --step_duration            Step duration
-        -ti     --trafic_increment         Trafic increment per step
         -sm     --station_to_calibrate_mac Station to calibrate mac address
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
@@ -98,33 +95,11 @@ def main():
         help="Duration of a transfer in secs",
     )
     parser.add_argument(
-        "-ti",
-        "--trafic_increment",
-        type=int,
-        help="Trafic increment per step^in MB",
-    )
-
-    parser.add_argument(
-        "-s",
-        "--stations",
-        type=int,
-        help="Number of connected stations",
-    )
-
-    parser.add_argument(
         "-sm",
         "--station_to_calibrate_mac",
         type=str,
         help="Station to calibrate mac address",
     )
-
-    parser.add_argument(
-        "-f",
-        "--files_path",
-        type=str,
-        help="Random files path (Only to generate random files)",
-    )
-
     parser.add_argument(
         "-fc",
         "--files_transfer_config",
@@ -207,11 +182,9 @@ def main():
     # Programs that dont need telnet connection
     if args.program == "generate_random_files":
         run_generate_random_files(
-            files_path=args.files_path,
-            stations=args.stations,
             total_steps=args.steps,
             seconds_per_step=args.step_duration,
-            trafic_increment_per_step_in_MB=args.trafic_increment
+            config_file=args.files_transfer_config,
         )
         return
     if args.program == "files_transfer":
