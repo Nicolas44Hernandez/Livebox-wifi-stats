@@ -1,6 +1,6 @@
 FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/st_1/
 STATIONS:
-- name: Android1_AC_BD_70_27_CA_19
+- name: HUAWEI_AC_BD_70_27_CA_19
   ip: 192.168.1.12
   ssh_user: nico
   ssh_password: nico

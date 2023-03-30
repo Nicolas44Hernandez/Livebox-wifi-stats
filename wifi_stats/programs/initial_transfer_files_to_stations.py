@@ -122,7 +122,12 @@ def run_initial_files_transfer_to_stations(config_file: str):
     directory = files_path.split('/')[-2]
 
     for station in stations_dict:
+        # Create directory in station
         create_directory(station=station, directory=directory)
+
+        # Send files to station
+        station_name = station["name"]
+        files_dir = f"{files_path}/{station_name}"
         send_files_to_station(
-            station=station, files_path=files_path, directory=directory
+            station=station, files_path=files_dir, directory=directory
         )

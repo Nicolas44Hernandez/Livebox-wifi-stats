@@ -66,7 +66,8 @@ if [ "$CONNECTED_STATIONS" -gt 0 ]; then
     sudo cp $SMOKEPING_CONFIG/Database /etc/smokeping/config.d/Database
     sudo cp $SMOKEPING_CONFIG/Probes /etc/smokeping/config.d/Probes
     sudo systemctl restart apache2 smokeping
-    sleep 2
+    echo ...
+    sleep 30
     sudo chmod -R 777 /var/lib/smokeping
 fi
 
