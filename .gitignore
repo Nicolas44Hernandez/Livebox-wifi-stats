@@ -16,3 +16,6 @@ __pycache__/
 
 # Venv
 .venv*/
+
+#Files sent from stations
+*.txt
