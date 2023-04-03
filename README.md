@@ -51,6 +51,10 @@ Install smokeping
 sudo apt-get install smokeping
 ```
 
+Install sshpass
+```bash
+sudo apt-get install sshpass
+```
 
 
 ## Configuration
