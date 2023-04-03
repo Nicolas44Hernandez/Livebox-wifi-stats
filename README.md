@@ -45,6 +45,14 @@ To install:
 pip install -r requirements.txt
 ```
 
+
+Install smokeping
+```bash
+sudo apt-get install smokeping
+```
+
+
+
 ## Configuration
 
 Before launching the script it is necessary to configure the different input arguments of the different programs.
