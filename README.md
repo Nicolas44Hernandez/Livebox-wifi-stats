@@ -40,6 +40,11 @@ In addition, the following Python packages are required:
 - PyYAML
 - telnetlib3
 
+To install:
+```bash
+pip install -r requirements.txt
+```
+
 ## Configuration
 
 Before launching the script it is necessary to configure the different input arguments of the different programs.

@@ -19,3 +19,4 @@ __pycache__/
 
 #Files sent from stations
 *.txt
+!requirements.txt
