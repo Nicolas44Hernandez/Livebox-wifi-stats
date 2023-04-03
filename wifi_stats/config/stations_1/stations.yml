@@ -1,4 +1,4 @@
-FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/st_1/
+FILES_PATH: /home/pi/workspace/Livebox-wifi-stats/files_to_send/st_1/
 STATIONS:
 - name: HUAWEI_AC_BD_70_27_CA_19
   ip: 192.168.1.12
