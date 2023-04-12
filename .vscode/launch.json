@@ -225,5 +225,12 @@
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]
         },
+        {
+            "name": "Simulation: Plot throughoputs",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/programs/analysis_traffic_graphics.py",
+            "console": "integratedTerminal",
+        },
     ]
 }
