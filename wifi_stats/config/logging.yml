@@ -13,70 +13,63 @@ handlers:
   __main__:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/main.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/main.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
-  generate_random_files:
+  setup:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/generate_ramdom_files.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/setup/setup.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   static_data:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/static_data.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/static_data.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   files_transfer:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/files_transfer.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
-
-  initial_files_transfer:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/initial_files_transfer_to_stations.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/files_transfer.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   info_stations:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/info_stations.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/info_stations.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   switch_band:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/switch_band.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/switch_band.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   chanim_stats:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/chanim_stats.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/chanim_stats.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   antenas_tx_rx_stats:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/antenas_tx_rx_stats.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/antenas_tx_rx_stats.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
   telnet:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/pi/workspace/Livebox-wifi-stats/wifi_stats/logs/telnet.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/telnet.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
@@ -85,6 +78,22 @@ root:
   handlers: [console]
 
 loggers:
+
+  programs.setup.generate_files:
+    level: DEBUG
+    handlers: [setup]
+    propagate: no
+
+  programs.setup.generate_traffic_config:
+    level: DEBUG
+    handlers: [setup]
+    propagate: no
+
+  programs.setup.initial_transfer_files_to_stations:
+    level: DEBUG
+    handlers: [setup]
+    propagate: no
+
   __main__:
     level: DEBUG
     handlers: [__main__]
@@ -105,17 +114,7 @@ loggers:
     handlers: [files_transfer]
     propagate: no
 
-  programs.initial_transfer_files_to_stations:
-    level: DEBUG
-    handlers: [initial_files_transfer]
-    propagate: no
-
   programs.initial_calibrate_stations:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.generate_random_files:
     level: DEBUG
     handlers: [console]
     propagate: no

@@ -113,12 +113,12 @@ def send_files_to_station(station, files_path: str, directory: str):
         logger.info("File sent")
 
 
-def run_initial_files_transfer_to_stations(config_file: str):
+def run_initial_files_transfer_to_stations(stations_config: str):
     """Entry point for initial transfer files program"""
 
     logger.info("RUNNING PROGRAM: Initial transfer files to stations")
 
-    stations_dict, files_path = get_test_params(config_file=config_file)
+    stations_dict, files_path = get_test_params(config_file=stations_config)
     directory = files_path.split('/')[-2]
 
     for station in stations_dict:
@@ -126,8 +126,6 @@ def run_initial_files_transfer_to_stations(config_file: str):
         create_directory(station=station, directory=directory)
 
         # Send files to station
-        station_name = station["name"]
-        files_dir = f"{files_path}/{station_name}"
         send_files_to_station(
-            station=station, files_path=files_dir, directory=directory
+            station=station, files_path=files_path, directory=directory
         )

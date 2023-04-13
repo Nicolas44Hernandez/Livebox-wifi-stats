@@ -1,0 +1,139 @@
+FILES_TO_TRANSFER:
+  - throughput_Mbs: 0
+    size_Mb: 1
+    times_to_send: 1
+  - throughput_Mbs: 1
+    size_Mb: 20
+    times_to_send: 1
+  - throughput_Mbs: 2
+    size_Mb: 40
+    times_to_send: 1
+  - throughput_Mbs: 3
+    size_Mb: 60
+    times_to_send: 1
+  - throughput_Mbs: 4
+    size_Mb: 80
+    times_to_send: 1
+  - throughput_Mbs: 5
+    size_Mb: 100
+    times_to_send: 1
+  - throughput_Mbs: 6
+    size_Mb: 120
+    times_to_send: 1
+  - throughput_Mbs: 7
+    size_Mb: 140
+    times_to_send: 1
+  - throughput_Mbs: 8
+    size_Mb: 160
+    times_to_send: 1
+  - throughput_Mbs: 9
+    size_Mb: 180
+    times_to_send: 1
+  - throughput_Mbs: 10
+    size_Mb: 200
+    times_to_send: 1
+  - throughput_Mbs: 12
+    size_Mb: 240
+    times_to_send: 1
+  - throughput_Mbs: 14
+    size_Mb: 280
+    times_to_send: 1
+  - throughput_Mbs: 16
+    size_Mb: 320
+    times_to_send: 1
+  - throughput_Mbs: 18
+    size_Mb: 360
+    times_to_send: 1
+  - throughput_Mbs: 20
+    size_Mb: 400
+    times_to_send: 1
+  - throughput_Mbs: 22
+    size_Mb: 240
+    times_to_send: 2
+  - throughput_Mbs: 24
+    size_Mb: 260
+    times_to_send: 2
+  - throughput_Mbs: 26
+    size_Mb: 280
+    times_to_send: 2
+  - throughput_Mbs: 28
+    size_Mb: 300
+    times_to_send: 2
+  - throughput_Mbs: 30
+    size_Mb: 320
+    times_to_send: 2
+  - throughput_Mbs: 32
+    size_Mb: 340
+    times_to_send: 2
+  - throughput_Mbs: 34
+    size_Mb: 360
+    times_to_send: 2
+  - throughput_Mbs: 36
+    size_Mb: 380
+    times_to_send: 2
+  - throughput_Mbs: 38
+    size_Mb: 400
+    times_to_send: 2
+  - throughput_Mbs: 40
+    size_Mb: 400
+    times_to_send: 2
+  - throughput_Mbs: 42
+    size_Mb: 220
+    times_to_send: 4
+  - throughput_Mbs: 44
+    size_Mb: 220
+    times_to_send: 4
+  - throughput_Mbs: 46
+    size_Mb: 240
+    times_to_send: 4
+  - throughput_Mbs: 48
+    size_Mb: 240
+    times_to_send: 4
+  - throughput_Mbs: 50
+    size_Mb: 260
+    times_to_send: 4
+  - throughput_Mbs: 52
+    size_Mb: 260
+    times_to_send: 4
+  - throughput_Mbs: 54
+    size_Mb: 280
+    times_to_send: 4
+  - throughput_Mbs: 56
+    size_Mb: 280
+    times_to_send: 4
+  - throughput_Mbs: 58
+    size_Mb: 300
+    times_to_send: 4
+  - throughput_Mbs: 60
+    size_Mb: 300
+    times_to_send: 4
+  - throughput_Mbs: 62
+    size_Mb: 320
+    times_to_send: 4
+  - throughput_Mbs: 64
+    size_Mb: 320
+    times_to_send: 4
+  - throughput_Mbs: 66
+    size_Mb: 340
+    times_to_send: 4
+  - throughput_Mbs: 68
+    size_Mb: 340
+    times_to_send: 4
+  - throughput_Mbs: 70
+    size_Mb: 360
+    times_to_send: 4
+  - throughput_Mbs: 72
+    size_Mb: 360
+    times_to_send: 4
+  - throughput_Mbs: 74
+    size_Mb: 380
+    times_to_send: 4
+  - throughput_Mbs: 76
+    size_Mb: 380
+    times_to_send: 4
+  - throughput_Mbs: 78
+    size_Mb: 400
+    times_to_send: 4
+  - throughput_Mbs: 80
+    size_Mb: 400
+    times_to_send: 4

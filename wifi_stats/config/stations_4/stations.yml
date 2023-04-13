@@ -1,5 +1,5 @@
 
-FILES_PATH: /home/pi/workspace/Livebox-wifi-stats/files_to_send/st_4/
+FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
   - name: HUAWEI_AC_BD_70_27_CA_19
     ip: 192.168.1.12
@@ -8,6 +8,7 @@ STATIONS:
     protocol: sftp
     operative_system: Android
     port: 2233
+    profile: LOW
     initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 1000
     initial_dead_time_in_secs: 2
@@ -20,6 +21,7 @@ STATIONS:
     protocol: scp
     operative_system: Windows
     port: 22
+    profile: MEDIUM
     initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 2000
     initial_dead_time_in_secs: 10
@@ -32,6 +34,7 @@ STATIONS:
     protocol: scp
     operative_system: Linux
     port: 22
+    profile: STEP
     initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 1000
     initial_dead_time_in_secs: 10
@@ -44,6 +47,7 @@ STATIONS:
     protocol: scp
     operative_system: Windows
     port: 22
+    profile: LOW_MEDIUM
     initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 2000
     initial_dead_time_in_secs: 10

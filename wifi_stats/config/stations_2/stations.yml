@@ -1,15 +1,16 @@
 
-FILES_PATH: /home/pi/workspace/Livebox-wifi-stats/files_to_send/st_2/
+FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
-  - name: HUAWEI_AC_BD_70_27_CA_19
-    ip: 192.168.1.12
+  - name: GALAXY_6C_C7_EC_2B_2E_D7
+    ip: 192.168.1.26
     ssh_user: nico
     ssh_password: nico
     protocol: sftp
     operative_system: Android
     port: 2233
+    profile: LOW_MEDIUM
     initial_data_rate_in_kbps: 0
-    throughput_increment_in_kbps: 1000
+    throughput_increment_in_kbps: 250
     initial_dead_time_in_secs: 2
     transfer_nb_per_step: 1
     send_interval_in_secs: 0.01
@@ -20,6 +21,7 @@ STATIONS:
     protocol: scp
     operative_system: Windows
     port: 22
+    profile: MEDIUM_HIGH
     initial_data_rate_in_kbps: 0
     throughput_increment_in_kbps: 2000
     initial_dead_time_in_secs: 10

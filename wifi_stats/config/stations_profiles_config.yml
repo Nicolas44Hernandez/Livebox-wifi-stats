@@ -1,0 +1,37 @@
+PROFILES:
+  - name: SUPER_LOW
+    from: 0
+    to: 1
+    step: No
+  - name: LOW
+    from: 0
+    to: 5
+    step: No
+  - name: LOW_MEDIUM
+    from: 0
+    to: 24
+    step: No
+  - name: MEDIUM
+    from: 6
+    to: 12
+    step: No
+  - name: MEDIUM_HIGH
+    from: 6
+    to: 36
+    step: No
+  - name: HIGH
+    from: 14
+    to: 36
+    step: No
+  - name: SUPER_HIGH
+    from: 38
+    to: 60
+    step: No
+  - name: ULTRA_HIGH
+    from: 62
+    to: 80
+    step: No
+  - name: STEP
+    from: 0
+    to: 50
+    step: Yes

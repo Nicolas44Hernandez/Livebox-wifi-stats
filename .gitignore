@@ -8,6 +8,7 @@ analyses_results
 
 # random files to send
 historic_results
+traffic_config_file.yml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -20,3 +21,6 @@ __pycache__/
 #Files sent from stations
 *.txt
 !requirements.txt
+
+# images
+*.png
