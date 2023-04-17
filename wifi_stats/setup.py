@@ -26,7 +26,6 @@ def main():
         -sp     --stations_profile_configuration      Config file for stations profiles
         -nf     --number_of_files_to_send_per_period  Number of files to send
         -p      --number_of_periods                   Number of files to send
-        -s      --stations_trafficking                Number of stations trafficking simultaneously
         -tc     --traffic_config_file_name            Name of the traffic config file to generate
         -ti     --traffic_plot_file_name              Name of the traffic plot file to generate
         -lc     --logs_configuration                  Logs configuration
@@ -71,14 +70,6 @@ def main():
         type=int,
         help="Number of periods",
     )
-
-    parser.add_argument(
-        "-s",
-        "--stations_trafficking",
-        type=int,
-        help="Number of stations trafficking simultaneously",
-    )
-
     parser.add_argument(
         "-tc",
         "--traffic_config_file_name",
@@ -121,7 +112,6 @@ def main():
                                 stations_profiles_config=args.stations_profile_configuration,
                                 number_of_files_to_send_per_period=args.number_of_files_to_send_per_period,
                                 number_of_periods=args.periods,
-                                number_of_stations_trafficking_simultaneously=args.stations_trafficking,
                                 traffic_config_file_name=args.traffic_config_file_name,
                                 traffic_plot_file_name=args.traffic_plot_file_name,
                                 )

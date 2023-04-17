@@ -86,7 +86,7 @@ loggers:
 
   programs.setup.generate_traffic_config:
     level: DEBUG
-    handlers: [setup]
+    handlers: [console]
     propagate: no
 
   programs.setup.initial_transfer_files_to_stations:
@@ -111,7 +111,7 @@ loggers:
 
   programs.files_transfer:
     level: DEBUG
-    handlers: [files_transfer]
+    handlers: [console]
     propagate: no
 
   programs.initial_calibrate_stations:
