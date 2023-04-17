@@ -48,6 +48,38 @@ def get_throughput_for_profiles(stations_profiles, throughputs_array):
     return throughput_for_profiles_dict
 
 
+def validate_configuration(
+    configurations_in_analysis,
+    candidate_stations_profiles_for_period
+):
+    """Validate candidate configuration for analysis"""
+    validated = True
+    for configuration in configurations_in_analysis:
+        # Check if have the same number of stations trafficking
+        stations_trafficking = len(configuration["stations"])
+        if stations_trafficking == len(candidate_stations_profiles_for_period):
+            # Check if have the same stations trafficking
+            same_stations = True
+            for station in candidate_stations_profiles_for_period:
+                if station not in configuration["stations"]:
+                    same_stations = False
+            # If not the same stations config ok
+            if not same_stations:
+                continue
+
+            # Check if same profiles in config
+            same_profiles = True
+            for station in candidate_stations_profiles_for_period:
+                if not candidate_stations_profiles_for_period[station] == configuration["stations"][station]:
+                    same_profiles = False
+
+            # If not the same stations, config ok
+            if not same_profiles:
+                continue
+
+    return validated
+
+
 def generate_random_throughputs_for_stations(
     number_of_files_to_send_per_period,
     periods,
@@ -59,28 +91,51 @@ def generate_random_throughputs_for_stations(
     # Prefill throughputs_dict array
     throughputs_dict = {}
     for station in stations_dict:
-        throughputs_dict[station["name"]] = {"throughputs": [], "profiles": []}
+        throughputs_dict[station["name"]] = {
+            "throughputs": [], "profiles": []}
 
     # Array used to select the stations trafficking
     stations_array = [station["name"] for station in stations_dict]
 
+    configurations_in_analysis = []
+
     # Loop over periods
     for n in range(periods):
 
-        # Get stations trafficking
-        nb_of_stations_trafficking = random.randrange(
-            1, len(stations_array) + 1)
-        stations_trafficking_in_period = random.sample(
-            stations_array, k=nb_of_stations_trafficking)
+        configuration_validated = False
 
-        # Get random profile for stations
-        stations_profiles_for_period = {}
+        while not configuration_validated:
+
+            # Generate candidate for configuration
+            # Get stations trafficking
+            nb_of_stations_trafficking = random.randrange(
+                1, len(stations_array) + 1)
+            stations_trafficking_in_period = random.sample(
+                stations_array, k=nb_of_stations_trafficking)
+
+            # Get random profile for stations
+            stations_profiles_for_period = {}
+            for station in stations_dict:
+                profile_for_period = random.choice(
+                    list(throughput_for_profiles_dict.keys()))
+                stations_profiles_for_period[station["name"]
+                                             ] = profile_for_period
+
+            configuration_validated = validate_configuration(
+                configurations_in_analysis,
+                stations_profiles_for_period,
+            )
+
+        # Add profiles to dict throughputs_dict
         for station in stations_dict:
-            profile_for_period = random.choice(
-                list(throughput_for_profiles_dict.keys()))
-            stations_profiles_for_period[station["name"]] = profile_for_period
             throughputs_dict[station["name"]]["profiles"].append(
-                profile_for_period)
+                stations_profiles_for_period[station["name"]])
+
+        # Append period configuration to control array
+        period_configuration = {
+            "stations": stations_profiles_for_period,
+        }
+        configurations_in_analysis.append(period_configuration)
 
         # Fill random throughput array for each station
         for i in range(number_of_files_to_send_per_period):
