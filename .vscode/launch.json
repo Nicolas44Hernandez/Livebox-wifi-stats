@@ -25,7 +25,7 @@
                 "-tc",
                 "${workspaceFolder}/wifi_stats/config/traffic_config_file.yml",
                 "-ti",
-                "${workspaceFolder}/wifi_stats/config/analysis_traffic.png",
+                "${workspaceFolder}/wifi_stats/config/analysis_traffic",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]
