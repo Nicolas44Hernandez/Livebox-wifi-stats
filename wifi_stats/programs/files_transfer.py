@@ -23,7 +23,6 @@ class FilesTransferManager(Thread):
         files_path: str,
         function: callable,
         interval_duration_secs: int = 20,
-        wait_first_time: bool = True,
         args=None,
         kwargs=None,
     ):
@@ -32,7 +31,6 @@ class FilesTransferManager(Thread):
         self.files_path = files_path
         self.function = function
         self.interval_duration_secs = interval_duration_secs
-        self.wait_first_time = wait_first_time
         self.max_occurrences = len(throughputs) - 1
         self.curr_occurrences = 0
         self.args = args if args is not None else []
@@ -46,6 +44,7 @@ class FilesTransferManager(Thread):
     def run(self):
         """Starts the file transfer"""
         self.kwargs["transfer_number"] = self.curr_occurrences
+        self.kwargs["transfer_direction"] = self.throughputs[self.curr_occurrences]["direction"]
         self.kwargs["throughput"] = self.throughputs[self.curr_occurrences]["throughput_Mbs"]
         self.kwargs["times_to_send"] = self.throughputs[self.curr_occurrences]["times"]
         self.kwargs["interval_duration"] = self.interval_duration_secs
@@ -262,8 +261,8 @@ def retreive_file_sftp(
 def transfer_file(
     station,
     files_path: str,
-    transfer_from_station: bool,
     transfer_number: int,
+    transfer_direction: str,
     throughput: int,
     interval_duration: int,
     times_to_send: int,
@@ -278,6 +277,7 @@ def transfer_file(
 
     # Get station params
     transfer_protocol = station["protocol"]
+    transfer_from_station = True if transfer_direction == "uplink" else False
 
     # Get transfert params
     data_rate_kbps = throughput * 1000
@@ -389,26 +389,16 @@ def run_files_transfer(
         station_name = station["name"]
         throughputs = throughputs_dict[station_name]
 
-        file_transfer_to_station_worker = FilesTransferManager(
+        file_transfer_worker = FilesTransferManager(
             throughputs=throughputs,
             files_path=files_path,
             function=transfer_file,
             interval_duration_secs=transfert_duration_in_secs,
-            wait_first_time=True,
-            args=(station, files_path, False)
+            args=(station, files_path)
         )
-        file_transfer_from_station_worker = FilesTransferManager(
-            throughputs=throughputs,
-            files_path=files_path,
-            function=transfer_file,
-            interval_duration_secs=transfert_duration_in_secs,
-            wait_first_time=True,
-            args=(station, files_path, True),
-        )
-        file_transfer_to_station_worker.start()
-        file_transfer_from_station_worker.start()
-        file_transfer_workers.append(file_transfer_to_station_worker)
-        file_transfer_workers.append(file_transfer_from_station_worker)
+
+        file_transfer_worker.start()
+        file_transfer_workers.append(file_transfer_worker)
 
     # Waiting loop
     now = datetime.now()

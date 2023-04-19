@@ -108,7 +108,9 @@ cp $SMOKEPING_CONFIG/Database analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/con
 cp $SMOKEPING_CONFIG/Probes analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Probes
 cp $STATIONS_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp $TRAFFIC_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-cp config/analysis_traffic.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp config/analysis_traffic_total.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp config/analysis_traffic_dl.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp config/analysis_traffic_ul.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp config/variables.env analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 
 # Move logs to results folder

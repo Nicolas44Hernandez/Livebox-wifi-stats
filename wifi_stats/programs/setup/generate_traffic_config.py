@@ -4,14 +4,11 @@ import logging
 import os
 import yaml
 import random
-import matplotlib.pyplot as plt
-import numpy as np
 from programs.files_transfer import get_test_params
 from programs.setup.generate_files import get_files_to_create_params
+from common.plots import generate_plots
 
 logger = logging.getLogger(__name__)
-
-STATIONS_COLOR = ['b-', 'g-', 'r-', 'y-', 'k-']
 
 
 def get_stations_profiles_params(stations_profiles_config: str):
@@ -92,7 +89,7 @@ def generate_random_throughputs_for_stations(
     throughputs_dict = {}
     for station in stations_dict:
         throughputs_dict[station["name"]] = {
-            "throughputs": [], "profiles": []}
+            "throughputs": [], "profiles": [], "direction": []}
 
     # Array used to select the stations trafficking
     stations_array = [station["name"] for station in stations_dict]
@@ -149,50 +146,12 @@ def generate_random_throughputs_for_stations(
                 throughputs_dict[station["name"]
                                  ]["throughputs"].append(_throughput)
 
+                # Add random traffic direction
+                _transfert_direction = random.choice(["uplink", "downlink"])
+                throughputs_dict[station["name"]
+                                 ]["direction"].append(_transfert_direction)
+
     return throughputs_dict
-
-
-def generate_plot_of_generated_throughputs(
-    throughputs_dict,
-    number_of_files_to_send_per_period: int,
-    number_of_periods: int,
-    traffic_plot_file_name: str,
-):
-    """Create plot of generated throughputs"""
-
-    fig, axs = plt.subplots(2)
-
-    arrays_len = number_of_files_to_send_per_period * number_of_periods
-    plt.style.use('_mpl-gallery')
-    x = range(0, arrays_len, 1)
-
-    # Calculate total traffic
-    total = np.zeros(arrays_len)
-    for i, station_throughputs in enumerate(throughputs_dict):
-        total = total + throughputs_dict[station_throughputs]["throughputs"]
-
-    # Plot stations troughtput
-    for i, station_throughputs in enumerate(throughputs_dict):
-        label = station_throughputs.split("_")[0]
-        axs[0].step(x, throughputs_dict[station_throughputs]["throughputs"],
-                    STATIONS_COLOR[i], linewidth=1.0, label=f"{label}")
-
-    axs[0].legend(loc='upper center', bbox_to_anchor=(
-        0.5, 1.2), fancybox=True, ncol=len(throughputs_dict))
-    axs[0].grid()
-
-    # Subplot total
-    axs[1].step(x, total, 'c-', linewidth=1.0, label=f"TOTAL")
-    axs[1].legend(loc='upper center')
-    axs[1].grid()
-
-    # Plot period lines
-    for i in range(number_of_periods):
-        axs[0].axvline(x=i*number_of_files_to_send_per_period,
-                       color='k', linestyle='--')
-        axs[1].axvline(x=i*number_of_files_to_send_per_period,
-                       color='k', linestyle='--')
-    plt.savefig(traffic_plot_file_name)
 
 
 def generate_stations_traffic_config_file(traffic_config_file_name: str, throughputs_dict, throughputs_array):
@@ -202,8 +161,8 @@ def generate_stations_traffic_config_file(traffic_config_file_name: str, through
     config_to_write_dict = {}
     for station in throughputs_dict:
         config_for_station = []
-        for throughput in throughputs_dict[station]["throughputs"]:
-            entry_dict = {"throughput_Mbs": throughput}
+        for throughput, direction in zip(throughputs_dict[station]["throughputs"], throughputs_dict[station]["direction"]):
+            entry_dict = {"throughput_Mbs": throughput, "direction": direction}
             for th, times in throughputs_array:
                 if th == throughput:
                     entry_dict["times"] = times
@@ -271,7 +230,7 @@ def run_generate_traffic_config(
     )
 
     # Print the generated throughputs for stations
-    generate_plot_of_generated_throughputs(
+    generate_plots(
         throughputs_dict,
         number_of_files_to_send_per_period,
         number_of_periods,
