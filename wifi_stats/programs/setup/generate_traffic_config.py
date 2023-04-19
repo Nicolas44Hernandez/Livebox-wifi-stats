@@ -203,7 +203,7 @@ def generate_stations_traffic_config_file(traffic_config_file_name: str, through
     for station in throughputs_dict:
         config_for_station = []
         for throughput in throughputs_dict[station]["throughputs"]:
-            entry_dict = {"througput_Mbs": throughput}
+            entry_dict = {"throughput_Mbs": throughput}
             for th, times in throughputs_array:
                 if th == throughput:
                     entry_dict["times"] = times

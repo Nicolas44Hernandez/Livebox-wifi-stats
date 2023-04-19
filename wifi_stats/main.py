@@ -10,9 +10,7 @@ from programs.static_data import run_static_data
 from programs.info_connected_stations import run_info_connected_stations
 from programs.switch_5GHz import run_switch_5GHz
 from programs.files_transfer import run_files_transfer
-from programs.initial_transfer_files_to_stations import run_initial_files_transfer_to_stations
 from programs.initial_calibrate_stations import run_calibrate_station
-from programs.generate_random_files import run_generate_random_files
 from programs.tx_rx_stats import run_tx_rx_stats
 
 USB_DEVICE_PATH = "/var/usbmount/kernel::"
@@ -31,18 +29,18 @@ def main():
         -l      --livebox                  Livebox ip address
         -u      --user                     Telnet connection user
         -pw     --password                 Telnet connection password
-        -fc     --files_transfer_config    Config file for files transfer program
+        -scf    --stations_config          Config file for stations
+        -tcf    --traffic_config           Config file for analysis traffic
         -ts     --timestamp                Analysis timestamp for results file
         -sc     --stations_columns_config  Config file for the result table in info stations program
         -ac     --antenas_columns_config   Config file for the result table in tx_rx_stats program
-        -d      --duration                 Analysis duration
+        -d      --duration                 Analysis duration in mins
+        -td     --transfert_duration       Transfert duration in secs
         -sp     --sampling_period_in_secs  Sampling period for information request
         -on     --on_period_in_secs        5GHz band ON period in secs
         -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
         -rd     --results_disk             External USB disk for analysis results
-        -st     --steps                    Total steps for files generation
-        -sd     --step_duration            Step duration
         -sm     --station_to_calibrate_mac Station to calibrate mac address
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
@@ -83,28 +81,24 @@ def main():
     )
 
     parser.add_argument(
-        "-st",
-        "--steps",
-        type=int,
-        help="Total steps for files generation",
-    )
-    parser.add_argument(
-        "-sd",
-        "--step_duration",
-        type=int,
-        help="Duration of a transfer in secs",
-    )
-    parser.add_argument(
         "-sm",
         "--station_to_calibrate_mac",
         type=str,
         help="Station to calibrate mac address",
     )
+
     parser.add_argument(
-        "-fc",
-        "--files_transfer_config",
+        "-scf",
+        "--stations_config",
         type=str,
-        help="Config file for files transfer program",
+        help="Config file for stations",
+    )
+
+    parser.add_argument(
+        "-tcf",
+        "--traffic_config_file",
+        type=str,
+        help="Config file for analysis traffic",
     )
 
     parser.add_argument(
@@ -133,6 +127,13 @@ def main():
         "--duration",
         type=int,
         help="Analysis duration in minutes",
+    )
+
+    parser.add_argument(
+        "-td",
+        "--transfert_duration",
+        type=int,
+        help="Transfert duration in seconds",
     )
 
     parser.add_argument(
@@ -169,6 +170,7 @@ def main():
         type=str,
         help="External USB disk for analysis results",
     )
+
     # Parse args
     args = parser.parse_args()
 
@@ -179,27 +181,19 @@ def main():
     logger.info(f"Running program: {args.program}")
     logger.info(f"args: {args}")
 
-    # Programs that dont need telnet connection
-    if args.program == "generate_random_files":
-        run_generate_random_files(
-            total_steps=args.steps,
-            seconds_per_step=args.step_duration,
-            config_file=args.files_transfer_config,
-        )
-        return
     if args.program == "files_transfer":
-        run_files_transfer(config_file=args.files_transfer_config,
-                           analysis_duration_in_minutes=args.duration)
-        return
-
-    if args.program == "initial_files_transfer_to_stations":
-        run_initial_files_transfer_to_stations(
-            config_file=args.files_transfer_config)
+        run_files_transfer(
+            stations_config=args.stations_config,
+            traffic_config_file=args.traffic_config_file,
+            analysis_duration_in_minutes=args.duration,
+            transfert_duration_in_secs=args.transfert_duration
+        )
         return
 
     # Create telnet instance
     telnet = Telnet(host=args.livebox, login=args.user, password=args.password)
 
+    # TODO: separate in a dedicated script
     if args.program == "initial_calibrate_stations":
         run_calibrate_station(
             telnet=telnet, station_mac=args.station_to_calibrate_mac)
@@ -214,6 +208,7 @@ def main():
     if args.program == "static_livebox_data":
         run_static_data(telnet=telnet, results_dir=results_dir)
         return
+
     if args.program == "switch_5GHz":
         run_switch_5GHz(
             telnet=telnet,
@@ -223,6 +218,7 @@ def main():
             off_period_in_secs=args.off_period_in_secs,
         )
         return
+
     if args.program == "chanim_stats":
         run_chanim_stats(
             telnet=telnet,
@@ -231,6 +227,7 @@ def main():
             sampling_period_in_seconds=args.sampling_period_in_secs
         )
         return
+
     if args.program == "stations":
         run_info_connected_stations(
             telnet=telnet,
@@ -240,6 +237,7 @@ def main():
             columns_config_file=args.stations_columns_config,
         )
         return
+
     if args.program == "antenas":
         run_tx_rx_stats(
             telnet=telnet,

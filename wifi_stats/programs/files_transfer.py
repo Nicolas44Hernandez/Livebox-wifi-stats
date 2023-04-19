@@ -3,38 +3,41 @@ Send files continuously to stations in order to create traffic in the network.
 """
 
 from datetime import datetime, timedelta
-import random
 from threading import Thread, Event
 import os
+import pexpect
+import subprocess
+from typing import Iterable
 import yaml
 from datetime import datetime
 import logging
 import time
-import subprocess
-import pexpect
 
 logger = logging.getLogger(__name__)
 
 
 class FilesTransferManager(Thread):
     def __init__(
-        self, interval, duration, function, args=None, kwargs=None, wait_first_time=True
+        self,
+        throughputs: Iterable[int],
+        files_path: str,
+        function: callable,
+        interval_duration_secs: int = 20,
+        wait_first_time: bool = True,
+        args=None,
+        kwargs=None,
     ):
         Thread.__init__(self)
-        self.interval = interval
+        self.throughputs = throughputs
+        self.files_path = files_path
         self.function = function
+        self.interval_duration_secs = interval_duration_secs
         self.wait_first_time = wait_first_time
-        self.max_occurrences = self.__get_occurrences(interval, duration)
+        self.max_occurrences = len(throughputs) - 1
         self.curr_occurrences = 0
         self.args = args if args is not None else []
         self.kwargs = kwargs if kwargs is not None else {}
         self.finished = Event()
-
-    def __get_occurrences(self, interval, duration):
-        """Returns the number of times that the file will be sent"""
-        occurenc_max = (duration * 60) / interval
-        logger.info(f"Files to send: {occurenc_max}")
-        return occurenc_max
 
     def cancel(self):
         """Stop the timer if it hasn't finished yet."""
@@ -42,21 +45,20 @@ class FilesTransferManager(Thread):
 
     def run(self):
         """Starts the file transfer"""
-        if self.wait_first_time:
-            self.finished.wait(self.interval)
-            self.wait_first_time = True
-        self.kwargs["transfer_number"] = self.curr_occurrences - 1
+        self.kwargs["transfer_number"] = self.curr_occurrences
+        self.kwargs["throughput"] = self.throughputs[self.curr_occurrences]["throughput_Mbs"]
+        self.kwargs["times_to_send"] = self.throughputs[self.curr_occurrences]["times"]
+        self.kwargs["interval_duration"] = self.interval_duration_secs
         if not self.finished.is_set():
-            initial_dead_time = self.args[0]["initial_dead_time_in_secs"]
-            if self.curr_occurrences < self.args[0]["transfer_nb_per_step"]:
-                logger.info(f"waiting {initial_dead_time} secs")
-                time.sleep(initial_dead_time)
-            else:
-                self.function(*self.args, **self.kwargs)
+            if self.curr_occurrences == 0:
+                logger.info(
+                    f"Initial deadtime: {self.interval_duration_secs} secs")
+                time.sleep(self.interval_duration_secs)
+            self.function(*self.args, **self.kwargs)
             self.curr_occurrences += 1
         # Loops stops after max_occurrences
         if (
-            self.curr_occurrences >= self.max_occurrences
+            self.curr_occurrences > self.max_occurrences
         ):
             logger.info(f"finished setted")
             self.finished.set()
@@ -65,109 +67,264 @@ class FilesTransferManager(Thread):
             self.run()
 
 
-def select_random_file(files_path: str):
-    """select a random file from the list."""
-
-    files_list = os.listdir(files_path)
-    selected_file = f"{files_path}{random.choice(files_list)}"
-    return selected_file
-
-
-def get_iteration_file(files_path: str, iteration: int, transfers_per_step: int):
+def get_iteration_file(files_path: str, throughput: int, ):
     """Get file for iteration"""
-    file_numner = int(iteration / transfers_per_step)
-    selected_file = f"{files_path}random_file{file_numner}.txt"
+    selected_file = f"{files_path}random_file_{throughput}MB.txt"
     return selected_file
 
 
-def transfer_file(station, files_path: str, transfer_from_station: bool, transfer_number: int):
-    """Send a ramdom file with a random rate to a station over SCP"""
-    # Ignore file 0
-    if transfer_number == 0:
-        return
+def send_file_scp(
+    _file: str,
+    data_rate_kbps: int,
+    station, times_to_send: int,
+    interval_duration: int,
+):
+    """Transfer file to station via SCP protocol"""
 
-    # Get station params
-    station_name = station["name"]
     station_ip = station["ip"]
     ssh_usr = station["ssh_user"]
     ssh_password = station["ssh_password"]
     transfer_protocol = station["protocol"]
-    port = station["port"]
-    throughput_increment = station["throughput_increment_in_kbps"]
-    transfer_nb_per_step = station["transfer_nb_per_step"]
-    initial_data_rate = station["initial_data_rate_in_kbps"]
     operative_system = station["operative_system"]
-    if throughput_increment is None:
-        data_rate = initial_data_rate
-        _file = select_random_file(files_path)
-    else:
-        data_rate = initial_data_rate + \
-            (throughput_increment * int(transfer_number / transfer_nb_per_step))
-        _file = get_iteration_file(
-            files_path, transfer_number, transfer_nb_per_step)
+    connection_time = station["connection_time"]
 
-    # if os.path.exists(_file):
+    transfer_duration = interval_duration/times_to_send
+
+    if not os.path.exists(_file):
+        logger.error(
+            f"Impossible to send file {_file}. File doesnt exist")
+        return False
+
+    f = _file.split("/")[-1]
+    _log_line = f"Sending file {f} to {station_ip} rate:{data_rate_kbps} kbps times: {times_to_send} protocol:{transfer_protocol} os:{operative_system}"
+    logger.info(_log_line)
+    command = (
+        f"sshpass -p '{ssh_password}' scp -l {data_rate_kbps} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
+    )
+
+    for i in range(times_to_send):
+        # logger.info(f"command: {command}")
+        time.sleep(connection_time)
+        try:
+            logger.info(f"Tx number {i}")
+            subprocess.call(command, shell=True, timeout=transfer_duration)
+        except subprocess.TimeoutExpired:
+            logger.error("Transfer is taking too long, cancelling transfer")
+    return True
+
+
+def retreive_file_scp(
+    _file: str,
+    data_rate_kbps: int,
+    station, times_to_send: int,
+    interval_duration: int
+):
+    """Transfer file from station via SCP protocol"""
+
+    station_ip = station["ip"]
+    station_name = station["name"]
+    ssh_usr = station["ssh_user"]
+    ssh_password = station["ssh_password"]
+    transfer_protocol = station["protocol"]
+    operative_system = station["operative_system"]
+    connection_time = station["connection_time"]
+
+    transfer_duration = interval_duration/times_to_send
+
+    f = _file.split("/")[-1]
+    _log_line = f"Retreiving file {f} from {station_ip} rate:{data_rate_kbps} kbps  times: {times_to_send} protocol:{transfer_protocol}  os:{operative_system}"
+    logger.info(_log_line)
+    file_to_get = _file.split(
+        "/")[-2] + "/" + _file.split("/")[-1]
+    command = (
+        f"sshpass -p '{ssh_password}' scp -l {data_rate_kbps} {ssh_usr}@{station_ip}:files_transfer/{file_to_get} file_{station_name}.txt"
+    )
+
+    for i in range(times_to_send):
+        # logger.info(f"command: {command}")
+        time.sleep(connection_time)
+        try:
+            logger.info(f"Rx number {i}")
+            subprocess.call(command, shell=True, timeout=transfer_duration)
+        except subprocess.TimeoutExpired:
+            logger.error("Transfer is taking too long, cancelling transfer")
+    return True
+
+
+def send_file_sftp(
+    _file: str,
+    data_rate_kbps: int,
+    station,
+    times_to_send: int,
+    interval_duration: int,
+):
+    """Transfer file to station via SFTP protocol"""
+
+    station_ip = station["ip"]
+    port = station["port"]
+    ssh_usr = station["ssh_user"]
+    ssh_password = station["ssh_password"]
+    transfer_protocol = station["protocol"]
+    connection_time = station["connection_time"]
+
+    transfer_duration = interval_duration/times_to_send
+
+    cmd_connect = (
+        f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate_kbps} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/"
+    )
+    try:
+        # Create sftp connection
+        logger.info("connection start")
+        child = pexpect.spawn(cmd_connect)
+        child.expect("sftp> ", timeout=connection_time)
+        logger.info("Connected")
+
+        if not os.path.exists(_file):
+            logger.error(
+                f"Impossible to send file {_file}. File doesnt exist")
+            return False
+        _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate_kbps} kbps times: {times_to_send} protocol:{transfer_protocol}"
+        logger.info(_log_line)
+
+        for i in range(times_to_send):
+            try:
+                logger.info(f"Tx number {i}")
+                cmd = f"put {_file} file.txt"
+                child.sendline(cmd)
+                child.expect("sftp> ", timeout=transfer_duration)
+
+                # Close connection
+                child.sendline("exit")
+                child.close()
+            except Exception as e:
+                logger.error(
+                    "Transfer is taking too long, cancelling transfer")
+    except Exception as e:
+        logger.error("Error in transfer")
+        child.close()
+        return False
+    return True
+
+
+def retreive_file_sftp(
+    _file: str,
+    data_rate_kbps: int,
+    station,
+    times_to_send: int,
+    interval_duration: int,
+):
+    """Transfer file from station via SFTP protocol"""
+
+    station_ip = station["ip"]
+    station_name = station["name"]
+    port = station["port"]
+    ssh_usr = station["ssh_user"]
+    ssh_password = station["ssh_password"]
+    transfer_protocol = station["protocol"]
+    connection_time = station["connection_time"]
+
+    transfer_duration = interval_duration/times_to_send
+
+    cmd_connect = (
+        f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate_kbps} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/"
+    )
+    try:
+        # Create sftp connection
+        logger.info("connection start")
+        child = pexpect.spawn(cmd_connect)
+        child.expect("sftp> ", timeout=connection_time)
+        logger.info("Connected")
+
+        file_to_get = _file.split("/")[-2] + "/" + _file.split("/")[-1]
+        _log_line = f"Retreiving file {file_to_get} from {station_ip} rate:{data_rate_kbps} kbps  times: {times_to_send}  protocol:{transfer_protocol}"
+        logger.info(_log_line)
+
+        for i in range(times_to_send):
+            try:
+                logger.info(f"Rx number {i}")
+                cmd = f"get {file_to_get} file_{station_name}.txt"
+                child.sendline(cmd)
+                child.expect("sftp> ", timeout=transfer_duration)
+
+                # Close connection
+                child.sendline("exit")
+                child.close()
+            except Exception as e:
+                logger.error(
+                    "Transfer is taking too long, cancelling transfer")
+    except Exception as e:
+        logger.error("Error in transfer")
+        child.close()
+        return False
+    return True
+
+
+def transfer_file(
+    station,
+    files_path: str,
+    transfer_from_station: bool,
+    transfer_number: int,
+    throughput: int,
+    interval_duration: int,
+    times_to_send: int,
+):
+    """Send a ramdom file with a random rate to a station over SCP"""
+    # If throughput is 0 just wait
+    logger.info(
+        f"transfer_number: {transfer_number}, throughput: {throughput} Mbps  interval_duration: {interval_duration}")
+    if throughput == 0:
+        time.sleep(interval_duration)
+        return
+
+    # Get station params
+    transfer_protocol = station["protocol"]
+
+    # Get transfert params
+    data_rate_kbps = throughput * 1000
+    _file = get_iteration_file(files_path, throughput)
+
     # Log start of transfer
     logger.info(f"Iteration: {transfer_number}")
+
     if transfer_protocol == "scp":
-        # SCP transfer file
+        # SCTP file transfer
         if transfer_from_station:
-            f = _file.split("/")[-1]
-            _log_line = f"Retreiving file {f} from {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}  os:{operative_system}"
-            logger.info(_log_line)
-            file_to_get = _file.split(
-                "/")[-2] + "/" + _file.split("/")[-1]
-            command = (
-                f"sshpass -p '{ssh_password}' scp -l {data_rate} {ssh_usr}@{station_ip}:files_transfer/{file_to_get} file_{station_name}.txt"
+            retreive_file_scp(
+                _file=_file,
+                data_rate_kbps=data_rate_kbps,
+                station=station,
+                times_to_send=times_to_send,
+                interval_duration=interval_duration,
             )
         else:
-            if not os.path.exists(_file):
-                logger.error(
-                    f"Impossible to send file {_file}. File doesnt exist")
-                return
-            _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol} os:{operative_system}"
-            logger.info(_log_line)
-            file_to_get = _file.split(
-                "/")[-2] + "/" + _file.split("/")[-1]
-            command = (
-                f"sshpass -p '{ssh_password}' scp -l {data_rate} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
+            send_file_scp(
+                _file=_file,
+                data_rate_kbps=data_rate_kbps,
+                station=station,
+                times_to_send=times_to_send,
+                interval_duration=interval_duration,
             )
-        # Run command
-        # logger.info(f"command: {command}")
-        os.system(command)
 
     elif transfer_protocol == "sftp":
         # SCTP file transfer
-        cmd_connect = (
-            f"sshpass -p '{ssh_password}' sftp -P {port} -l {data_rate} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/"
-        )
-        try:
-            child = pexpect.spawn(cmd_connect)
+        if transfer_from_station:
+            retreive_file_sftp(
+                _file=_file,
+                data_rate_kbps=data_rate_kbps,
+                station=station,
+                times_to_send=times_to_send,
+                interval_duration=interval_duration,
+            )
+        else:
+            send_file_sftp(
+                _file=_file,
+                data_rate_kbps=data_rate_kbps,
+                station=station,
+                times_to_send=times_to_send,
+                interval_duration=interval_duration,
+            )
 
-            child.expect("sftp> ", timeout=1)
-            if transfer_from_station:
-                file_to_get = _file.split(
-                    "/")[-2] + "/" + _file.split("/")[-1]
-                _log_line = f"Retreiving file {file_to_get} from {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
-                logger.info(_log_line)
-                cmd = f"get {file_to_get} file_{station_name}.txt"
-            else:
-                if not os.path.exists(_file):
-                    logger.error(
-                        f"Impossible to send file {_file}. File doesnt exist")
-                    return
-                _log_line = f"Sending file {_file} to {station_ip} rate:{data_rate} kbps  protocol:{transfer_protocol}"
-                logger.info(_log_line)
-                cmd = f"put {_file} file.txt"
-            child.sendline(cmd)
-            child.expect("sftp> ")
-            child.sendline("exit")
-            child.close()
-        except Exception as e:
-            logger.error("Error in transfer")
-            child.close()
-
-    logger.info("File transfer done")
+    logger.info("Iteration done")
 
 
 def get_test_params(config_file: str):
@@ -192,7 +349,29 @@ def get_test_params(config_file: str):
     return stations_dict, files_path
 
 
-def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
+def get_throughputs_dict_from_file(traffic_config_file: str):
+    """
+    Retrieve the throughput dict from the yml config file
+    """
+
+    logger.info(f"Trafic config file: {traffic_config_file}")
+    # Read yml config file
+    with open(traffic_config_file, "r") as stream:
+        try:
+            parsed_yaml = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            logger.error(exc)
+
+    # Extract data
+    return parsed_yaml
+
+
+def run_files_transfer(
+    stations_config: str,
+    traffic_config_file: str,
+    analysis_duration_in_minutes: int,
+    transfert_duration_in_secs: int
+):
     """Entry point for files transfer program"""
 
     logger.info("RUNNING PROGRAM: files transfer")
@@ -200,23 +379,30 @@ def run_files_transfer(config_file: str, analysis_duration_in_minutes: int):
     estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
-    stations_dict, files_path = get_test_params(config_file=config_file)
+    stations_dict, files_path = get_test_params(config_file=stations_config)
+    throughputs_dict = get_throughputs_dict_from_file(
+        traffic_config_file=traffic_config_file)
 
     file_transfer_workers = []
 
     for station in stations_dict:
         station_name = station["name"]
-        files_dir = f"{files_path}{station_name}/"
+        throughputs = throughputs_dict[station_name]
+
         file_transfer_to_station_worker = FilesTransferManager(
-            interval=station["send_interval_in_secs"],
-            duration=analysis_duration_in_minutes,
+            throughputs=throughputs,
+            files_path=files_path,
             function=transfer_file,
-            args=(station, files_dir, False),
+            interval_duration_secs=transfert_duration_in_secs,
+            wait_first_time=True,
+            args=(station, files_path, False)
         )
         file_transfer_from_station_worker = FilesTransferManager(
-            interval=station["send_interval_in_secs"],
-            duration=analysis_duration_in_minutes,
+            throughputs=throughputs,
+            files_path=files_path,
             function=transfer_file,
+            interval_duration_secs=transfert_duration_in_secs,
+            wait_first_time=True,
             args=(station, files_path, True),
         )
         file_transfer_to_station_worker.start()
