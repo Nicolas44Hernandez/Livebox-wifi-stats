@@ -7,11 +7,11 @@ title = Network Latency Grapher
 remark = Welcome to the SmokePing website of xxx Company. \
          Here you will learn all about the latency of our network.
 
-+ HUAWEI_AC_BD_70_27_CA_19
++ GALAXY_6C_C7_EC_2B_2E_D7
 
-menu = HUAWEI_AC_BD_70_27_CA_19
-title = HUAWEI_AC_BD_70_27_CA_19
-host = 192.168.1.12
+menu = GALAXY_6C_C7_EC_2B_2E_D7
+title = GALAXY_6C_C7_EC_2B_2E_D7
+host = 192.168.1.26
 
 + PC1_Wigreen_78_AF_08_31_B1_18
 

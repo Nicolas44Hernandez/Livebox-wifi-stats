@@ -8,6 +8,7 @@ declare -a LOG_FILES=("chanim_stats.log"
                       "switch_band.log"
                       "telnet.log"
                       "antenas_tx_rx_stats.log"
+                      "setup/setup.log"
                       )
 
 source config/variables.env
@@ -22,7 +23,8 @@ echo Livebox address: $LIVEBOX_IP_ADDR
 echo Box name: $BOX_NAME
 echo Connected stations: $CONNECTED_STATIONS
 echo Analysis duration: $ANALYSIS_DURATION_IN_MINUTES
-echo Files transfer config file: $FILES_TRASNSFER_CONFIG
+echo Stations config file: $STATIONS_CONFIG
+echo Traffic config file: $TRAFFIC_CONFIG
 echo Smokeping config file: $SMOKEPING_CONFIG
 echo Logging config file: $LOGGING_CONFIG_FILE
 echo Connected stations results config file: $CONNECTED_STATIONS_RESULTS_CONFIG
@@ -39,6 +41,7 @@ echo "Creating log files..."
 mkdir analyses_results
 rm -r logs
 mkdir logs
+mkdir logs/setup
 mkdir analyses_results/$BOX_NAME
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/logs
@@ -57,19 +60,17 @@ do
 done
 
 # Configure and run smokeping
-if [ "$CONNECTED_STATIONS" -gt 0 ]; then
-    echo  Launching Smokeping service
-    sudo systemctl stop apache2 smokeping
-    sleep 2
-    sudo rm -f /var/lib/smokeping/*.rrd
-    sudo cp $SMOKEPING_CONFIG/Targets /etc/smokeping/config.d/Targets
-    sudo cp $SMOKEPING_CONFIG/Database /etc/smokeping/config.d/Database
-    sudo cp $SMOKEPING_CONFIG/Probes /etc/smokeping/config.d/Probes
-    sudo systemctl restart apache2 smokeping
-    echo ...
-    sleep 30
-    sudo chmod -R 777 /var/lib/smokeping
-fi
+echo  Launching Smokeping service
+sudo systemctl stop apache2 smokeping
+sleep 2
+sudo rm -f /var/lib/smokeping/*.rrd
+sudo cp $SMOKEPING_CONFIG/Targets /etc/smokeping/config.d/Targets
+sudo cp $SMOKEPING_CONFIG/Database /etc/smokeping/config.d/Database
+sudo cp $SMOKEPING_CONFIG/Probes /etc/smokeping/config.d/Probes
+sudo systemctl restart apache2 smokeping
+echo ...
+sleep 30
+sudo chmod -R 777 /var/lib/smokeping
 
 echo  ------------------------------------------------
 # Run analysis programs
@@ -88,13 +89,11 @@ if [ "$SWITCH_5GHZ_BAND" = true ]; then
 
 fi
 
-if [ "$CONNECTED_STATIONS" -gt 0 ]; then
-    echo  Running program: INFO STATIONS STATS
-    python3 main.py -p stations -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -sc $CONNECTED_STATIONS_RESULTS_CONFIG -ts $ANALYSIS_TIMESTAMP &
+echo  Running program: INFO STATIONS STATS
+python3 main.py -p stations -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -sc $CONNECTED_STATIONS_RESULTS_CONFIG -ts $ANALYSIS_TIMESTAMP &
 
-    echo  Running program: FILES TRANSFER
-    python3 main.py -p files_transfer -fc $FILES_TRASNSFER_CONFIG  -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE &
-fi
+echo  Running program: FILES TRANSFER
+python3 main.py -p files_transfer -scf $STATIONS_CONFIG -tcf $TRAFFIC_CONFIG -td $TRANSFER_DURATION_IN_SECS -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE &
 
 echo  ------------------------------------------------
 
@@ -104,12 +103,12 @@ RESULTS_EXTRACTION_TIME=`expr $ANALYSIS_DURATION_IN_MINUTES + 1`
 SMOKEPING_RESULT_FILES=`ls /var/lib/smokeping/*.rrd`
 
 # Move analysis config to results folder
-if [ "$CONNECTED_STATIONS" -gt 0 ]; then
-    cp $SMOKEPING_CONFIG/Targets analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Targets
-    cp $SMOKEPING_CONFIG/Database analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Databse
-    cp $SMOKEPING_CONFIG/Probes analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Probes
-    cp $FILES_TRASNSFER_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-fi
+cp $SMOKEPING_CONFIG/Targets analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Targets
+cp $SMOKEPING_CONFIG/Database analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Databse
+cp $SMOKEPING_CONFIG/Probes analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Probes
+cp $STATIONS_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp $TRAFFIC_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp config/analysis_traffic.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp config/variables.env analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 
 # Move logs to results folder
@@ -119,12 +118,10 @@ do
 done
 
 # Move smokeping results to results folder
-if [ "$CONNECTED_STATIONS" -gt 0 ]; then
-    echo "sudo systemctl stop apache2 smokeping" | at now +$RESULTS_EXTRACTION_TIME minutes
-    for result_file in $SMOKEPING_RESULT_FILES
-    do
-        echo Schedule task to retrieve $result_file
-        echo "mv -f $result_file analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/smokeping/rrd_files/" | at now +$RESULTS_EXTRACTION_TIME minutes
-    done
-fi
+echo "sudo systemctl stop apache2 smokeping" | at now +$RESULTS_EXTRACTION_TIME minutes
+for result_file in $SMOKEPING_RESULT_FILES
+do
+    echo Schedule task to retrieve $result_file
+    echo "mv -f $result_file analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/smokeping/rrd_files/" | at now +$RESULTS_EXTRACTION_TIME minutes
+done
 echo "sudo chmod -R 777 analyses_results" | at now +$RESULTS_EXTRACTION_TIME minutes
