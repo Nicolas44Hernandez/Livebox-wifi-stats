@@ -1,5 +1,5 @@
 
-FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
+FILES_PATH: /home/pi/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
   - name: GALAXY_6C_C7_EC_2B_2E_D7
     ip: 192.168.1.26
