@@ -1,10 +1,9 @@
-"""Wifi stats application"""
+"""Setup wifi stats application"""
 
 import logging
 from logging.config import dictConfig
 import yaml
 import argparse
-from common import Telnet
 from programs.setup.generate_files import run_generate_random_files
 from programs.setup.initial_transfer_files_to_stations import run_initial_files_transfer_to_stations
 from programs.setup.generate_traffic_config import run_generate_traffic_config

@@ -34,11 +34,11 @@
             "name": "STATIONS CALIBRATION",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/main.py",
+            "program": "${workspaceFolder}/wifi_stats/calibration.py",
             "console": "integratedTerminal",
             "args": [
-                "-p",
-                "initial_calibrate_stations",
+                "-n",
+                "livebox_nico_test",
                 "-l",
                 "192.168.1.1",
                 "-u",
@@ -46,7 +46,7 @@
                 "-pw",
                 "sah",
                 "-sm",
-                "78:AF:08:31:B1:18",
+                "6C:C7:EC:2B:2E:D7",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]

@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import logging
 import time
 from common.telnet import Telnet
-import yaml
 from programs.info_connected_stations import get_connected_stations, parse_telnet_output
 
 

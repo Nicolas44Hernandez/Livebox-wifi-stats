@@ -10,7 +10,6 @@ from programs.static_data import run_static_data
 from programs.info_connected_stations import run_info_connected_stations
 from programs.switch_5GHz import run_switch_5GHz
 from programs.files_transfer import run_files_transfer
-from programs.initial_calibrate_stations import run_calibrate_station
 from programs.tx_rx_stats import run_tx_rx_stats
 
 USB_DEVICE_PATH = "/var/usbmount/kernel::"
@@ -41,7 +40,6 @@ def main():
         -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
         -rd     --results_disk             External USB disk for analysis results
-        -sm     --station_to_calibrate_mac Station to calibrate mac address
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
@@ -78,13 +76,6 @@ def main():
         "--password",
         type=str,
         help="Password",
-    )
-
-    parser.add_argument(
-        "-sm",
-        "--station_to_calibrate_mac",
-        type=str,
-        help="Station to calibrate mac address",
     )
 
     parser.add_argument(
@@ -192,12 +183,6 @@ def main():
 
     # Create telnet instance
     telnet = Telnet(host=args.livebox, login=args.user, password=args.password)
-
-    # TODO: separate in a dedicated script
-    if args.program == "initial_calibrate_stations":
-        run_calibrate_station(
-            telnet=telnet, station_mac=args.station_to_calibrate_mac)
-        return
 
     # Create results dir
     device = f"/var/usbmount/kernel::{args.results_disk}/"
