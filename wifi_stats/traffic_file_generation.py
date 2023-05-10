@@ -1,7 +1,13 @@
 
 from datetime import datetime
+from logging.config import dictConfig
+import logging
 import argparse
 import os
+import yaml
+
+logger = logging.getLogger(__name__)
+
 
 FILE_NAME="files_transfer.log"
 RESULT_FILE_NAME="requested_throughput.txt"
@@ -107,13 +113,10 @@ def write_result_file(entries_to_write, result_file:str):
     f.close()
 
 
-def generate_requested_throughput_result_file(directory: str, root: str):
+def generate_requested_throughput_result_file(log_file: str, result_file: str):
     """Generate requested throughputs result file"""
 
-    #directory = "C3_C04-24_SC1"
-    _file = f"{root}/{directory}/{FILE_NAME}"
-
-    file1 = open(_file, 'r')
+    file1 = open(log_file, 'r')
     Lines = file1.readlines()
 
     lines_to_use = []
@@ -176,30 +179,54 @@ def generate_requested_throughput_result_file(directory: str, root: str):
                         entries_to_write.append(transfer_stop)
                         transfer_in_progress_th3 = None
 
-    _result_file = f"{root}/{directory}/{RESULT_FILE_NAME}"
-    write_result_file(entries_to_write=entries_to_write, result_file=_result_file)
+    write_result_file(entries_to_write=entries_to_write, result_file=result_file)
 
 def main():
     """
     Entry point, this method parses the args and run the program
     Args:
-        -fd   --files_dir     Directory where the files are
+        -tf   --transfer_log_file     Transfer log file
+        -rf   --result_file           Result generated file
+        -lc     --logs_configuration                  Logs configuration
+
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
     parser.add_argument(
-        "-fd",
-        "--files_dir",
+        "-tf",
+        "--transfer_log_file",
         type=str,
-        help="Directory where the files are",
+        help="Transfer log file",
+    )
+
+    parser.add_argument(
+        "-rf",
+        "--result_file",
+        type=str,
+        help="Result generated file",
+    )
+
+    parser.add_argument(
+        "-lc",
+        "--logs_configuration",
+        type=str,
+        help="Logs config",
     )
 
     # Parse args
     args = parser.parse_args()
-    directories_list = os.listdir(args.files_dir)
 
-    for directory in directories_list:
-        generate_requested_throughput_result_file(directory=directory, root=args.files_dir)
+    # Load logging configuration
+    with open(args.logs_configuration) as stream:
+        dictConfig(yaml.full_load(stream))
+
+
+    # Check if logfile exists
+    if not os.path.exists(args.transfer_log_file) or not os.path.isfile(args.transfer_log_file):
+        logger.error("Log file doesnt exist, check path")
+        return
+
+    generate_requested_throughput_result_file(log_file=args.transfer_log_file, result_file=args.result_file)
 
 if __name__ == "__main__":
     main()

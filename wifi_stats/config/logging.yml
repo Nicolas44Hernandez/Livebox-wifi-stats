@@ -99,6 +99,11 @@ loggers:
     handlers: [__main__]
     propagate: no
 
+  traffic_file_generation:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   programs.chanim_stats:
     level: DEBUG
     handlers: [chanim_stats]

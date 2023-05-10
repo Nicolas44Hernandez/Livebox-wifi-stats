@@ -99,7 +99,8 @@ echo  ------------------------------------------------
 
 # Schedule results and logs extraction
 echo "Schedule Results and logs extraction"
-RESULTS_EXTRACTION_TIME=`expr $ANALYSIS_DURATION_IN_MINUTES + 1`
+GENERATE_REQUESTED_TRAFFIC_FILE_TIME=`expr $ANALYSIS_DURATION_IN_MINUTES + 1`
+RESULTS_EXTRACTION_TIME=`expr $ANALYSIS_DURATION_IN_MINUTES + 2`
 SMOKEPING_RESULT_FILES=`ls /var/lib/smokeping/*.rrd`
 
 # Move analysis config to results folder
@@ -119,6 +120,12 @@ for log_file in logs
 do
    echo "mv -f $log_file analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/" | at now +$RESULTS_EXTRACTION_TIME minutes
 done
+
+# Generate requested throughput file
+requested_traffic_result_file="analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/analysis_results/requested_throughput.txt"
+traffic_log_file="logs/files_transfer.log"
+echo Schedule task Generate requested throughput file $requested_traffic_result_file
+echo "python3 traffic_file_generation.py -tf $traffic_log_file -rf $requested_traffic_result_file -lc $LOGGING_CONFIG_FILE" | at now +$GENERATE_REQUESTED_TRAFFIC_FILE_TIME minutes
 
 # Move smokeping results to results folder
 echo "sudo systemctl stop apache2 smokeping" | at now +$RESULTS_EXTRACTION_TIME minutes

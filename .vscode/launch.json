@@ -11,8 +11,12 @@
             "program": "${workspaceFolder}/traffic_file_generation.py",
             "console": "integratedTerminal",
             "args": [
-                "-fd",
-                "${workspaceFolder}/transfer_log_files/Campaign_3",
+                "-tf",
+                "${workspaceFolder}/wifi_stats/analysis_results/analyses_results/Campagne3/C3_SC4/2023-04-20_18-24/logs/files_transfer.log",
+                "-rf",
+                "${workspaceFolder}/test_file.txt",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]
         },
         {
