@@ -111,6 +111,7 @@ cp $TRAFFIC_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp config/analysis_traffic_total.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp config/analysis_traffic_dl.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp config/analysis_traffic_ul.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp config/stations_profiles_config.yml analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp config/variables.env analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 
 # Move logs to results folder

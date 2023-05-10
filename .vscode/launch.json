@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "GENERATE REQUESTED THROUGHPUT RESULT FILES",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/traffic_file_generation.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-fd",
+                "${workspaceFolder}/transfer_log_files/Campaign_3",
+            ]
+        },
+        {
             "name": "SETUP ANALYSIS",
             "type": "python",
             "request": "launch",
