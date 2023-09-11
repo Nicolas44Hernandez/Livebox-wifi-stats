@@ -67,6 +67,23 @@
             ]
         },
         {
+            "name": "LIVEBOX COUNTERTS LOG",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/log_livebox_counters.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-l",
+                "192.168.1.1",
+                "-u",
+                "root",
+                "-pw",
+                "sah",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging.yml",
+            ]
+        },
+        {
             "name": "RUN ANALYSIS: Files transfer",
             "type": "python",
             "request": "launch",
