@@ -4,7 +4,8 @@ import numpy as np
 plt.rcParams["figure.figsize"] = [12, 8]
 plt.rcParams["figure.autolayout"] = True
 
-STATIONS_COLOR = ['b-', 'g-', 'r-', 'y-', 'k-']
+STATIONS_COLOR = ['blue', 'green', 'red', 'purple', 'black']
+BINS=90
 
 
 def generate_plots(
@@ -19,21 +20,32 @@ def generate_plots(
         throughputs_dict,
         number_of_files_to_send_per_period,
         number_of_periods,
-        traffic_plot_file_name
     )
 
     generate_ul_throughputs(
         throughputs_dict,
         number_of_files_to_send_per_period,
         number_of_periods,
-        traffic_plot_file_name
     )
 
     generate_dl_throughputs(
         throughputs_dict,
         number_of_files_to_send_per_period,
         number_of_periods,
-        traffic_plot_file_name
+    )
+
+    generate_stations_probability_distribution_function_plots(throughputs_dict)
+
+    generate_stations_cumulative_probability_distribution_function_plots(
+        throughputs_dict,
+        number_of_files_to_send_per_period,
+        number_of_periods
+    )
+
+    generate_total_distribution_plots(
+        throughputs_dict,
+        number_of_files_to_send_per_period,
+        number_of_periods
     )
 
     save_figures(traffic_plot_file_name)
@@ -43,7 +55,6 @@ def generate_total_throughputs(
     throughputs_dict,
     number_of_files_to_send_per_period: int,
     number_of_periods: int,
-    traffic_plot_file_name: str,
 ):
     """Create plot of total generated throughputs"""
 
@@ -85,7 +96,6 @@ def generate_ul_throughputs(
     throughputs_dict,
     number_of_files_to_send_per_period: int,
     number_of_periods: int,
-    traffic_plot_file_name: str,
 ):
     """Create plot of ul generated throughputs"""
 
@@ -139,7 +149,6 @@ def generate_dl_throughputs(
     throughputs_dict,
     number_of_files_to_send_per_period: int,
     number_of_periods: int,
-    traffic_plot_file_name: str,
 ):
     """Create plot of dl generated throughputs"""
 
@@ -188,15 +197,168 @@ def generate_dl_throughputs(
         axs[1].axvline(x=i*number_of_files_to_send_per_period,
                        color='k', linestyle='--')
 
+def generate_stations_probability_distribution_function_plots(throughputs_dict):
+    """Create plot of stations throughputs distributions"""
+
+    if len(throughputs_dict.keys()) == 1:
+        fig4, axs = plt.subplots()
+    else:
+        fig4, axs = plt.subplots(len(throughputs_dict.keys()))
+
+    for i, station in enumerate(throughputs_dict):
+        label = station.split("_")[0]
+
+        # getting data of the histogram
+        count, bins_count = np.histogram(throughputs_dict[station]["throughputs"], bins=BINS)
+
+        # finding the PDF of the histogram using count values
+        pdf = count / sum(count)
+
+        # Plot PDF
+        if len(throughputs_dict.keys()) == 1:
+            axs.bar(
+                bins_count[1:],
+                pdf,
+                width=3,
+                color = STATIONS_COLOR[i],
+                label=f"{label}",
+            )
+            axs.set_xticks(np.arange(0, max(throughputs_dict[station]["throughputs"])+1, 10), minor=False)
+            axs.legend(loc='upper center')
+            axs.grid()
+        else:
+            axs[i].bar(
+                bins_count[1:],
+                pdf,
+                width=3,
+                color = STATIONS_COLOR[i],
+                label=f"{label}",
+            )
+            axs[i].set_xticks(np.arange(0, max(throughputs_dict[station]["throughputs"])+1, 10), minor=False)
+            axs[i].legend(loc='upper center')
+            axs[i].grid()
+
+
+    fig4.suptitle('PDF by stations', fontsize=12)
+
+def generate_stations_cumulative_probability_distribution_function_plots(
+        throughputs_dict,
+        number_of_files_to_send_per_period: int,
+        number_of_periods: int
+    ):
+    """Create plot of stations throughputs probability distributions"""
+
+    if len(throughputs_dict.keys()) == 1:
+        fig5, axs = plt.subplots()
+    else:
+        fig5, axs = plt.subplots(len(throughputs_dict.keys()))
+
+    for i, station in enumerate(throughputs_dict):
+        label = station.split("_")[0]
+
+        # initializing random values
+        arrays_len = number_of_files_to_send_per_period * number_of_periods
+        data = np.random.randn(arrays_len)
+        data = throughputs_dict[station]["throughputs"]
+
+        # getting data of the histogram
+        count, bins_count = np.histogram(data, bins=BINS)
+
+        # finding the PDF of the histogram using count values
+        pdf = count / sum(count)
+        # Generate CDF
+        cdf = np.cumsum(pdf)
+
+        # Plot CDF
+        if len(throughputs_dict.keys()) == 1:
+            axs.plot(
+                bins_count[1:],
+                cdf,
+                color = STATIONS_COLOR[i],
+                label=f"{label}"
+            )
+            axs.set_xticks(np.arange(0, max(bins_count)+1, 10), minor=False)
+            axs.legend(loc='upper center')
+            axs.grid()
+
+        else:
+            axs[i].plot(
+                bins_count[1:],
+                cdf,
+                color = STATIONS_COLOR[i],
+                label=f"{label}"
+            )
+            axs[i].set_xticks(np.arange(0, max(bins_count)+1, 10), minor=False)
+            axs[i].legend(loc='upper center')
+            axs[i].grid()
+
+    fig5.suptitle('CDF function by stations', fontsize=12)
+
+
+
+def generate_total_distribution_plots(
+        throughputs_dict,
+        number_of_files_to_send_per_period: int,
+        number_of_periods: int):
+    """Create plot of total throughputs distribution"""
+
+    fig6, axs = plt.subplots(2)
+
+    # Concatenate throughput arrays
+    data = [0 for ele in range(number_of_files_to_send_per_period * number_of_periods)]
+    for station in throughputs_dict:
+        data = [ele + data[i] for i,ele in enumerate(throughputs_dict[station]["throughputs"])]
+
+    # getting data of the histogram
+    count, bins_count = np.histogram(data, bins=BINS)
+
+    # finding the PDF of the histogram using count values
+    pdf = count / sum(count)
+    # Generate CDF
+    cdf = np.cumsum(pdf)
+
+    # Plot CDF
+    axs[0].bar(
+        bins_count[1:],
+        pdf,
+        width=3,
+        color = "black",
+        label=f"Probability distribution"
+    )
+
+    axs[0].set_xticks(np.arange(0, max(bins_count)+1, 10), minor=False)
+    axs[0].legend(loc='upper center')
+    axs[0].grid()
+
+    # Plot CDF
+    axs[1].plot(
+        bins_count[1:],
+        cdf,
+        color = "black",
+        label=f"Cumulative probability distribution"
+    )
+
+    axs[1].set_xticks(np.arange(0, max(bins_count)+1, 10), minor=False)
+    axs[1].legend(loc='upper center')
+    axs[1].grid()
+
+    fig6.suptitle('Total PDF and CDF', fontsize=12)
+
 
 def save_figures(traffic_plot_file_name):
     fig_nums = plt.get_fignums()
     figs = [plt.figure(n) for n in fig_nums]
     for i, fig in enumerate(figs):
         if i == 0:
-            file_name = f"{traffic_plot_file_name}_total.png"
+            file_name = f"{traffic_plot_file_name}traffic_total.png"
         elif i == 1:
-            file_name = f"{traffic_plot_file_name}_ul.png"
+            file_name = f"{traffic_plot_file_name}traffic_ul.png"
         elif i == 2:
-            file_name = f"{traffic_plot_file_name}_dl.png"
+            file_name = f"{traffic_plot_file_name}traffic_dl.png"
+        elif i == 3:
+            file_name = f"{traffic_plot_file_name}probability_distribution_by_station.png"
+        elif i == 4:
+            file_name = f"{traffic_plot_file_name}cumulative_probability_distribution_by_station.png"
+        elif i == 5:
+            file_name = f"{traffic_plot_file_name}total_probability_distribution.png"
         fig.savefig(file_name)

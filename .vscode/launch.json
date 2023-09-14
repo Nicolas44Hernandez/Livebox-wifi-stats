@@ -8,7 +8,7 @@
             "name": "GENERATE REQUESTED THROUGHPUT RESULT FILES",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/traffic_file_generation.py",
+            "program": "${workspaceFolder}/wifi_stats/traffic_file_generation.py",
             "console": "integratedTerminal",
             "args": [
                 "-tf",
@@ -29,18 +29,18 @@
                 //"--generate-files",
                 "-sc",
                 "${workspaceFolder}/wifi_stats/config/stations.yml",
-                "-fc",
-                "${workspaceFolder}/wifi_stats/config/files_to_send_config.yml",
-                "-sp",
-                "${workspaceFolder}/wifi_stats/config/stations_profiles_config.yml",
-                "-nf",
-                "10",
-                "-p",
-                "8",
+                "-nf", // samples per period
+                "180",
+                "-p", // periods
+                "4",
+                "-sd", // standard deviation
+                "5",
+                "-ss", // sample size
+                "90",
                 "-tc",
                 "${workspaceFolder}/wifi_stats/config/traffic_config_file.yml",
                 "-ti",
-                "${workspaceFolder}/wifi_stats/config/analysis_traffic",
+                "${workspaceFolder}/wifi_stats/config/plots/",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]

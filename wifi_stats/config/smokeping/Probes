@@ -3,5 +3,5 @@
 + FPing
 
 binary = /usr/bin/fping
-timeout = 2
+timeout = 5
 hostinterval = 0.02

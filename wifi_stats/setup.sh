@@ -10,6 +10,10 @@ echo SETUP INFO
 echo Files transfer config file: $FILES_TRASNSFER_CONFIG
 echo Logging config file: $LOGGING_CONFIG_FILE
 echo Setup files transfer config directory: $SETUP_FILES_TRASNSFER_CONFIG_DIR
+echo Total periods: $TOTAL_PERIODS
+echo Files transfer per period: $FILES_TRANSFER_PER_PERIOD
+echo Standard deviation: $STANDARD_DEVIATION
+echo Sample size: $SAMPLE_SIZE
 echo ------------------------------
 
 # Create setup log files
@@ -23,6 +27,6 @@ do
 done
 
 echo ---------------------SETUP-----------------------
-# python3 setup.py --generate-files -sc $SETUP_FILES_TRASNSFER_CONFIG_DIR/stations.yml -fc $SETUP_FILES_TRASNSFER_CONFIG_DIR/files_to_send_config.yml -sp $SETUP_FILES_TRASNSFER_CONFIG_DIR/stations_profiles_config.yml -nf '10' -p '10' -tc $SETUP_FILES_TRASNSFER_CONFIG_DIR/traffic_config_file.yml -ti $SETUP_FILES_TRASNSFER_CONFIG_DIR/analysis_traffic -lc $LOGGING_CONFIG_FILE
-python3 setup.py -sc $SETUP_FILES_TRASNSFER_CONFIG_DIR/stations.yml -fc $SETUP_FILES_TRASNSFER_CONFIG_DIR/files_to_send_config.yml -sp $SETUP_FILES_TRASNSFER_CONFIG_DIR/stations_profiles_config.yml -nf '10' -p '10' -tc $SETUP_FILES_TRASNSFER_CONFIG_DIR/traffic_config_file.yml -ti $SETUP_FILES_TRASNSFER_CONFIG_DIR/analysis_traffic -lc $LOGGING_CONFIG_FILE
+# python3 setup.py --generate-files -sc $SETUP_FILES_TRASNSFER_CONFIG_DIR/stations.yml -nf $FILES_TRANSFER_PER_PERIOD -p $TOTAL_PERIODS -sd $STANDARD_DEVIATION -ss $SAMPLE_SIZE -tc $SETUP_FILES_TRASNSFER_CONFIG_DIR/traffic_config_file.yml -ti $SETUP_FILES_TRASNSFER_CONFIG_DIR/plots/ -lc $LOGGING_CONFIG_FILE
+python3 setup.py -sc $SETUP_FILES_TRASNSFER_CONFIG_DIR/stations.yml -nf $FILES_TRANSFER_PER_PERIOD -p $TOTAL_PERIODS -sd $STANDARD_DEVIATION -ss $SAMPLE_SIZE -tc $SETUP_FILES_TRASNSFER_CONFIG_DIR/traffic_config_file.yml -ti $SETUP_FILES_TRASNSFER_CONFIG_DIR/plots/ -lc $LOGGING_CONFIG_FILE
 echo  ------------------------------------------------

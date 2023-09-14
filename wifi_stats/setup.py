@@ -21,10 +21,10 @@ def main():
     Args:
         --generate-files                              If pressent generate analysis files
         -sc     --stations_config                     Config file for stations
-        -fc     --files_to_send_config                Config file for files transfer program
-        -sp     --stations_profile_configuration      Config file for stations profiles
         -nf     --number_of_files_to_send_per_period  Number of files to send
         -p      --number_of_periods                   Number of files to send
+        -sd     --standard_deviation                  Standard deviation for random throughputs generator
+        -ss     --sample_size                         Sample size for random throughputs generator
         -tc     --traffic_config_file_name            Name of the traffic config file to generate
         -ti     --traffic_plot_file_name              Name of the traffic plot file to generate
         -lc     --logs_configuration                  Logs configuration
@@ -41,21 +41,6 @@ def main():
         type=str,
         help="Config file for stations",
     )
-
-    parser.add_argument(
-        "-fc",
-        "--files_to_send_config",
-        type=str,
-        help="Config file for files transfer program",
-    )
-
-    parser.add_argument(
-        "-sp",
-        "--stations_profile_configuration",
-        type=str,
-        help="Config file for stations profiles",
-    )
-
     parser.add_argument(
         "-nf",
         "--number_of_files_to_send_per_period",
@@ -69,6 +54,21 @@ def main():
         type=int,
         help="Number of periods",
     )
+
+    parser.add_argument(
+        "-sd",
+        "--standard_deviation",
+        type=int,
+        help="Standard deviation for random throughputs generator",
+    )
+
+    parser.add_argument(
+        "-ss",
+        "--sample_size",
+        type=int,
+        help="Sample size for random throughputs generator",
+    )
+
     parser.add_argument(
         "-tc",
         "--traffic_config_file_name",
@@ -98,8 +98,7 @@ def main():
 
     if args.generate_files:
         # Generate files
-        run_generate_random_files(stations_config=args.stations_config,
-                                  files_to_send_config=args.files_to_send_config)
+        run_generate_random_files(stations_config=args.stations_config)
 
         # Transfer files to stations
         run_initial_files_transfer_to_stations(
@@ -107,10 +106,10 @@ def main():
 
     # Generate traffic config
     run_generate_traffic_config(stations_config=args.stations_config,
-                                files_to_send_config=args.files_to_send_config,
-                                stations_profiles_config=args.stations_profile_configuration,
                                 number_of_files_to_send_per_period=args.number_of_files_to_send_per_period,
                                 number_of_periods=args.periods,
+                                standard_deviation=args.standard_deviation,
+                                sample_size=args.sample_size,
                                 traffic_config_file_name=args.traffic_config_file_name,
                                 traffic_plot_file_name=args.traffic_plot_file_name,
                                 )

@@ -2,159 +2,115 @@
 
 import logging
 import os
+from typing import Iterable
 import yaml
 import random
+import numpy as np
 from programs.files_transfer import get_test_params
-from programs.setup.generate_files import get_files_to_create_params
 from common.plots import generate_plots
 
 logger = logging.getLogger(__name__)
 
-
-def get_stations_profiles_params(stations_profiles_config: str):
-    """Parse stations profiles config file"""
-    logger.info(f"Stations profiles config file: {stations_profiles_config}")
-    # Read yml config file
-    with open(stations_profiles_config, "r") as stream:
-        try:
-            parsed_yaml = yaml.safe_load(stream)
-        except yaml.YAMLError as exc:
-            logger.error(exc)
-
-    # Extract data
-    return parsed_yaml["PROFILES"]
-
-
-def get_throughput_for_profiles(stations_profiles, throughputs_array):
-    """Generate dict of throughput profiles"""
-    throughput_for_profiles_dict = {}
-    for profile in stations_profiles:
-        throughputs_array_for_profile = []
-        _from = int(profile["from"])
-        _to = int(profile["to"])
-        _step = profile["step"]
-        if _step:
-            throughputs_array_for_profile = [_from, _to]
-        else:
-            for throughput, _ in throughputs_array:
-                if throughput >= _from and throughput <= _to:
-                    throughputs_array_for_profile.append(throughput)
-        throughput_for_profiles_dict[profile["name"]
-                                     ] = throughputs_array_for_profile
-
-    return throughput_for_profiles_dict
-
-
-def validate_configuration(
-    configurations_in_analysis,
-    candidate_stations_profiles_for_period
+def generate_throughput_candidates_list(
+    number_of_elements: int,
+    accel_factor: float,
 ):
-    """Validate candidate configuration for analysis"""
-    validated = True
-    for configuration in configurations_in_analysis:
-        # Check if have the same number of stations trafficking
-        stations_trafficking = len(configuration["stations"])
-        if stations_trafficking == len(candidate_stations_profiles_for_period):
-            # Check if have the same stations trafficking
-            same_stations = True
-            for station in candidate_stations_profiles_for_period:
-                if station not in configuration["stations"]:
-                    same_stations = False
-            # If not the same stations config ok
-            if not same_stations:
-                continue
+    """Generate list of candidates for a station in a period"""
+    list_of_values = [0,1]
+    previous = 1
+    for i in range(number_of_elements - 2):
+        value = round(previous*accel_factor,1)
+        list_of_values.append(value)
+        previous = value
+    return list_of_values
 
-            # Check if same profiles in config
-            same_profiles = True
-            for station in candidate_stations_profiles_for_period:
-                if not candidate_stations_profiles_for_period[station] == configuration["stations"][station]:
-                    same_profiles = False
 
-            # If not the same stations, config ok
-            if not same_profiles:
-                continue
+def generate_station_throughputs_sequence_for_period(
+        list_of_candidates: Iterable[float],
+        standar_deviation: float,
+        sample_size: int = 20,
+        total_number_of_elements: int = 1000,
+    ):
+    """
+    Generate random list of throughputs for a station, the generated values
+    depend on RNORM function using average value contained in the list and a StDev
+    """
+    full_list = []
+    exponent_factor = 1.3
 
-    return validated
+    while len(full_list) < total_number_of_elements:
 
+        # Random position in the throughput list
+        position = round(np.random.uniform()*(len(list_of_candidates)-1))
+
+        # Adjust the std deviation to the throughput
+        if list_of_candidates[position] > standar_deviation * 5:
+            local_standar_deviation = list_of_candidates[position] / 5
+        else:
+            local_standar_deviation = standar_deviation
+
+        # Format normal function args
+        mean = list_of_candidates[position]
+        sd = local_standar_deviation
+        local_sample_size = round(sample_size/(((position+1)**exponent_factor)))
+
+        # Generate new list
+        samples = np.random.normal(loc=mean, scale=sd, size=local_sample_size)
+        _list = [round(sample,1) for sample in samples]
+        # Remove negative elements
+        new_list = [abs(element) for element in _list]
+
+        # Concatenate elements to list
+        if len(new_list) + len(full_list) <= total_number_of_elements:
+            full_list = full_list + new_list
+        else:
+            elements_to_concatenate = total_number_of_elements - len(full_list)
+            full_list = full_list + new_list[:elements_to_concatenate]
+
+    return full_list
 
 def generate_random_throughputs_for_stations(
     number_of_files_to_send_per_period,
     periods,
+    standar_deviation,
+    sample_size,
     stations_dict,
-    throughput_for_profiles_dict
 ):
     """Generate random throughputs for the analysis for each station"""
 
     # Prefill throughputs_dict array
     throughputs_dict = {}
     for station in stations_dict:
-        throughputs_dict[station["name"]] = {
-            "throughputs": [], "profiles": [], "direction": []}
+        throughputs_dict[station["name"]] = {"throughputs": [], "direction": []}
 
     # Array used to select the stations trafficking
     stations_array = [station["name"] for station in stations_dict]
 
-    configurations_in_analysis = []
-
     # Loop over periods
     for n in range(periods):
 
-        configuration_validated = False
+        for station in stations_array:
+            # Generate random for accel factor
+            accel_factor = 1.45+(np.random.uniform()*.2)
+            throughput_candidates_for_period = generate_throughput_candidates_list(number_of_elements=12, accel_factor=accel_factor)
 
-        while not configuration_validated:
-
-            # Generate candidate for configuration
-            # Get stations trafficking
-            nb_of_stations_trafficking = random.randrange(
-                1, len(stations_array) + 1)
-            stations_trafficking_in_period = random.sample(
-                stations_array, k=nb_of_stations_trafficking)
-
-            # Get random profile for stations
-            stations_profiles_for_period = {}
-            for station in stations_dict:
-                profile_for_period = random.choice(
-                    list(throughput_for_profiles_dict.keys()))
-                stations_profiles_for_period[station["name"]
-                                             ] = profile_for_period
-
-            configuration_validated = validate_configuration(
-                configurations_in_analysis,
-                stations_profiles_for_period,
+            throughput_for_station = generate_station_throughputs_sequence_for_period(
+                list_of_candidates=throughput_candidates_for_period,
+                standar_deviation=standar_deviation,
+                sample_size=sample_size,
+                total_number_of_elements=number_of_files_to_send_per_period
             )
 
-        # Add profiles to dict throughputs_dict
-        for station in stations_dict:
-            throughputs_dict[station["name"]]["profiles"].append(
-                stations_profiles_for_period[station["name"]])
+            # Append throughput for period
+            throughputs_dict[station]["throughputs"] += throughput_for_station
 
-        # Append period configuration to control array
-        period_configuration = {
-            "stations": stations_profiles_for_period,
-        }
-        configurations_in_analysis.append(period_configuration)
-
-        # Fill random throughput array for each station
-        for i in range(number_of_files_to_send_per_period):
-            for station in stations_dict:
-                if station["name"] in stations_trafficking_in_period:
-                    _throughput = random.choice(
-                        throughput_for_profiles_dict[stations_profiles_for_period[station["name"]]])
-                else:
-                    _throughput = 0
-
-                throughputs_dict[station["name"]
-                                 ]["throughputs"].append(_throughput)
-
-                # Add random traffic direction
-                _transfert_direction = random.choice(["uplink", "downlink"])
-                throughputs_dict[station["name"]
-                                 ]["direction"].append(_transfert_direction)
+            # Add random traffic direction
+            _transfert_directions = [random.choice(["uplink", "downlink"]) for i in range(number_of_files_to_send_per_period)]
+            throughputs_dict[station]["direction"] += _transfert_directions
 
     return throughputs_dict
 
-
-def generate_stations_traffic_config_file(traffic_config_file_name: str, throughputs_dict, throughputs_array):
+def generate_stations_traffic_config_file(traffic_config_file_name: str, throughputs_dict):
     """Generate stations traffic config yml file"""
 
     logger.info(f"Writting traffic config file in: {traffic_config_file_name}")
@@ -162,11 +118,7 @@ def generate_stations_traffic_config_file(traffic_config_file_name: str, through
     for station in throughputs_dict:
         config_for_station = []
         for throughput, direction in zip(throughputs_dict[station]["throughputs"], throughputs_dict[station]["direction"]):
-            entry_dict = {"throughput_Mbs": throughput, "direction": direction}
-            for th, times in throughputs_array:
-                if th == throughput:
-                    entry_dict["times"] = times
-                    break
+            entry_dict = {"throughput_Mbs": float(throughput), "direction": direction}
             config_for_station.append(entry_dict)
         config_to_write_dict[station] = config_for_station
 
@@ -179,20 +131,18 @@ def log_analysis_configuration_generated(throughputs_dict):
     """Log the generated configuration"""
     logger.info(f"***************Generated configuration*********************")
     for station in throughputs_dict:
-        profiles = throughputs_dict[station]["profiles"]
         throughputs = throughputs_dict[station]["throughputs"]
         logger.info(f"Station {station}")
-        logger.info(f"Profiles {profiles}")
         logger.info(f"Throughputs {throughputs}")
     logger.info(f"***********************************************************")
 
 
 def run_generate_traffic_config(
     stations_config: str,
-    files_to_send_config: str,
-    stations_profiles_config: str,
     number_of_files_to_send_per_period: int,
     number_of_periods: int,
+    standard_deviation: float,
+    sample_size: int,
     traffic_config_file_name: str,
     traffic_plot_file_name: str,
 ):
@@ -200,33 +150,22 @@ def run_generate_traffic_config(
 
     logger.info(f'RUNNING PROGRAM: generate traffic config')
     logger.info(f"Stations config file: {stations_config}")
-    logger.info(f"Files to send config file: {files_to_send_config}")
-    logger.info(f"Stations profiles config file: {stations_profiles_config}")
     logger.info(f"Number of periods: {number_of_periods}")
+    logger.info(f"Standard deviation: {standard_deviation}")
+    logger.info(f"Sample size: {sample_size}")
     logger.info(
         f"Number of files to send per period: {number_of_files_to_send_per_period}")
     logger.info(f"Traffic config file name: {traffic_config_file_name}")
 
     stations_dict, files_path = get_test_params(config_file=stations_config)
 
-    # Create throughput array
-    files = get_files_to_create_params(files_to_send_config)
-    throughputs_array = []
-    for file in files:
-        _data = (file["throughput_Mbs"], file["times_to_send"])
-        throughputs_array.append(_data)
-
-    # Load stations profiles config
-    stations_profiles = get_stations_profiles_params(stations_profiles_config)
-    throughput_for_profiles_dict = get_throughput_for_profiles(
-        stations_profiles, throughputs_array)
-
     # Generate random throughput for stations dict
     throughputs_dict = generate_random_throughputs_for_stations(
         number_of_files_to_send_per_period,
         number_of_periods,
+        standard_deviation,
+        sample_size,
         stations_dict,
-        throughput_for_profiles_dict
     )
 
     # Print the generated throughputs for stations
@@ -238,8 +177,7 @@ def run_generate_traffic_config(
     )
 
     # Generate stations traffic config file
-    generate_stations_traffic_config_file(
-        traffic_config_file_name, throughputs_dict, throughputs_array)
+    generate_stations_traffic_config_file(traffic_config_file_name, throughputs_dict)
 
     # Manage directory permisions
     command = f"chmod -R 777 {files_path}"
