@@ -5,7 +5,7 @@ plt.rcParams["figure.figsize"] = [12, 8]
 plt.rcParams["figure.autolayout"] = True
 
 STATIONS_COLOR = ['blue', 'green', 'red', 'purple', 'black']
-BINS=90
+BINS=180
 
 
 def generate_plots(
@@ -75,8 +75,7 @@ def generate_total_throughputs(
                     STATIONS_COLOR[i], linewidth=1.0, label=f"{label}")
 
     fig1.suptitle('Total traffic UL + DL', fontsize=12)
-    axs[0].legend(loc='upper center', fancybox=True,
-                  ncol=len(throughputs_dict))
+    axs[0].legend(loc='upper center', ncol=len(throughputs_dict))
     axs[0].grid()
 
     # Subplot total
@@ -128,8 +127,7 @@ def generate_ul_throughputs(
                     linewidth=1.0, label=f"{label}")
 
     fig2.suptitle('UL traffic', fontsize=12)
-    axs[0].legend(loc='upper center', bbox_to_anchor=(
-        0.5, 1.2), fancybox=True, ncol=len(ul_dict))
+    axs[0].legend(loc='upper center', ncol=len(ul_dict))
     axs[0].grid()
 
     # Subplot total
@@ -181,8 +179,7 @@ def generate_dl_throughputs(
                     linewidth=1.0, label=f"{label}")
 
     fig3.suptitle('DL traffic', fontsize=12)
-    axs[0].legend(loc='upper center', bbox_to_anchor=(
-        0.5, 1.2), fancybox=True, ncol=len(dl_dict))
+    axs[0].legend(loc='upper center', ncol=len(dl_dict))
     axs[0].grid()
 
     # Subplot total
@@ -203,8 +200,9 @@ def generate_stations_probability_distribution_function_plots(throughputs_dict):
     if len(throughputs_dict.keys()) == 1:
         fig4, axs = plt.subplots()
     else:
-        fig4, axs = plt.subplots(len(throughputs_dict.keys()))
+        fig4, axs = plt.subplots(len(throughputs_dict.keys()), sharex=True)
 
+    _max_throughput = 0
     for i, station in enumerate(throughputs_dict):
         label = station.split("_")[0]
 
@@ -234,10 +232,17 @@ def generate_stations_probability_distribution_function_plots(throughputs_dict):
                 color = STATIONS_COLOR[i],
                 label=f"{label}",
             )
-            axs[i].set_xticks(np.arange(0, max(throughputs_dict[station]["throughputs"])+1, 10), minor=False)
+            # Update max throughput
+            if max(throughputs_dict[station]["throughputs"]) > _max_throughput:
+                _max_throughput = max(throughputs_dict[station]["throughputs"])
+
+    # Set x axe ticks
+    if len(throughputs_dict.keys()) > 1:
+        for i, station in enumerate(throughputs_dict):
+            axs[i].set_xticks(np.arange(0, _max_throughput+10, 10), minor=False)
             axs[i].legend(loc='upper center')
             axs[i].grid()
-
+            axs[i].xaxis.set_tick_params(labelbottom=True)
 
     fig4.suptitle('PDF by stations', fontsize=12)
 
@@ -253,6 +258,7 @@ def generate_stations_cumulative_probability_distribution_function_plots(
     else:
         fig5, axs = plt.subplots(len(throughputs_dict.keys()))
 
+    _max_throughput = 0
     for i, station in enumerate(throughputs_dict):
         label = station.split("_")[0]
 
@@ -288,9 +294,17 @@ def generate_stations_cumulative_probability_distribution_function_plots(
                 color = STATIONS_COLOR[i],
                 label=f"{label}"
             )
-            axs[i].set_xticks(np.arange(0, max(bins_count)+1, 10), minor=False)
+            # Update max throughput
+            if max(throughputs_dict[station]["throughputs"]) > _max_throughput:
+                _max_throughput = max(throughputs_dict[station]["throughputs"])
+
+    # Set x axe ticks
+    if len(throughputs_dict.keys()) > 1:
+        for i, station in enumerate(throughputs_dict):
+            axs[i].set_xticks(np.arange(0, _max_throughput+10, 5), minor=False)
             axs[i].legend(loc='upper center')
             axs[i].grid()
+            axs[i].xaxis.set_tick_params(labelbottom=True)
 
     fig5.suptitle('CDF function by stations', fontsize=12)
 
