@@ -89,8 +89,8 @@ def transfer_file_scp(
 
     # Log transfert
     f = _file.split("/")[-1]
-    _ll = "Retreiving" if transfer_from_station else "Sending"
-    _log_line = f"{_ll} file {f} from {station_ip} rate:{data_rate_kbps} kbps protocol:{transfer_protocol}  os:{operative_system}"
+    _ll = f"Retreiving file {f} from" if transfer_from_station else f"Sending file {f} to"
+    _log_line = f"{_ll} {station_ip} rate:{data_rate_kbps} kbps protocol:{transfer_protocol}  os:{operative_system}"
     logger.info(_log_line)
 
     # Generate transfert scp command
