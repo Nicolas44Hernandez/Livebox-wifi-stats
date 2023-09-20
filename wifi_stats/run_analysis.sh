@@ -47,6 +47,7 @@ mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/logs
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping
+mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/plots
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/analysis_results
 mkdir analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/smokeping
@@ -63,14 +64,12 @@ done
 echo  Launching Smokeping service
 sudo systemctl stop apache2 smokeping
 sleep 2
-sudo rm -f /var/lib/smokeping/*.rrd
-sudo cp $SMOKEPING_CONFIG/Targets /etc/smokeping/config.d/Targets
-sudo cp $SMOKEPING_CONFIG/Database /etc/smokeping/config.d/Database
-sudo cp $SMOKEPING_CONFIG/Probes /etc/smokeping/config.d/Probes
+sudo rm -f /usr/local/smokeping/data/SearchEngine/*.rrd
+sudo cp $SMOKEPING_CONFIG /usr/local/smokeping/etc/config
 sudo systemctl restart apache2 smokeping
 echo ...
 sleep 30
-sudo chmod -R 777 /var/lib/smokeping
+sudo chmod -R 777 /usr/local/smokeping/data/SearchEngine
 
 echo  ------------------------------------------------
 # Run analysis programs
@@ -101,19 +100,13 @@ echo  ------------------------------------------------
 echo "Schedule Results and logs extraction"
 GENERATE_REQUESTED_TRAFFIC_FILE_TIME=`expr $ANALYSIS_DURATION_IN_MINUTES + 1`
 RESULTS_EXTRACTION_TIME=`expr $ANALYSIS_DURATION_IN_MINUTES + 2`
-SMOKEPING_RESULT_FILES=`ls /var/lib/smokeping/*.rrd`
+SMOKEPING_RESULT_FILES=`ls /usr/local/smokeping/data/SearchEngine/*.rrd`
 
 # Move analysis config to results folder
-cp $SMOKEPING_CONFIG/Targets analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Targets
-cp $SMOKEPING_CONFIG/Database analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Databse
-cp $SMOKEPING_CONFIG/Probes analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/Probes
+cp $SMOKEPING_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/smokeping/
 cp $STATIONS_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
 cp $TRAFFIC_CONFIG analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-cp config/analysis_traffic_total.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-cp config/analysis_traffic_dl.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-cp config/analysis_traffic_ul.png analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-cp config/stations_profiles_config.yml analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
-cp config/variables.env analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/
+cp config/plots/* analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/config/plots
 
 # Move logs to results folder
 for log_file in logs

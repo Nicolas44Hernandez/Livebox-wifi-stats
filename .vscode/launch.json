@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "args": [
                 "-tf",
-                "${workspaceFolder}/wifi_stats/analysis_results/analyses_results/Campagne3/C3_SC4/2023-04-20_18-24/logs/files_transfer.log",
+                "${workspaceFolder}/wifi_stats/analyses_results/CAMP_4_PRE1/2023-09-20_10-49/logs/files_transfer.log",
                 "-rf",
                 "${workspaceFolder}/test_file.txt",
                 "-lc",

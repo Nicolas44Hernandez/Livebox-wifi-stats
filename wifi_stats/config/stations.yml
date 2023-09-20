@@ -17,11 +17,11 @@ STATIONS:
     connection_time: 6
     operative_system: Linux
     port: 22
-  - name: HUAWEI_AC_BD_70_27_CA_19
-    ip: 192.168.1.15
-    ssh_user: nico
-    ssh_password: nico
-    protocol: sftp
+  - name: PC1_Wigreen_78_AF_08_31_B1_18
+    ip: 192.168.1.27
+    ssh_user: pc1_w
+    ssh_password: Wigreen1234$
+    protocol: scp
     connection_time: 6
-    operative_system: Android
-    port: 2233
+    operative_system: Windows
+    port: 22
