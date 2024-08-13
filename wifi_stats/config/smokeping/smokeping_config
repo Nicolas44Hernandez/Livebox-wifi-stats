@@ -15,7 +15,7 @@ syslogfacility = smokeping
 *** Database ***
 step     = 2
 pings    = 10
-AVERAGE  0.5   1  1008
+AVERAGE  0.5   1  4320
 AVERAGE  0.5  12  4320
     MIN  0.5  12  4320
     MAX  0.5  12  4320
@@ -70,15 +70,15 @@ height = 200
 unison_tolerance = 2
 
 "Last 5 Minutes"    5m
-"Last 10 Minutes"  10m
 "Last 15 Minutes"  15m
 "Last Hour"         1h
+"Last 2 Hours"      2h
 
 
 *** Probes ***
 + FPing
 binary = /usr/bin/fping
-timeout = 5
+timeout = 2
 hostinterval = 0.02
 
 *** Targets ***
@@ -95,7 +95,7 @@ title = Search Engine
 
 menu = GALAXY_6C_C7_EC_2B_2E_D7
 title = GALAXY_6C_C7_EC_2B_2E_D7
-host = 192.168.1.26
+host = 192.168.1.13
 
 ++ RPI_E4_5F_01_E8_C1_2E
 
@@ -109,3 +109,8 @@ menu = PC1_Wigreen_78_AF_08_31_B1_18
 title = PC1_Wigreen_78_AF_08_31_B1_18
 host = 192.168.1.27
 
+++ HUAWEI_AC_BD_70_27_CA_19
+
+menu = HUAWEI_AC_BD_70_27_CA_19
+title = HUAWEI_AC_BD_70_27_CA_19
+host = 192.168.1.12

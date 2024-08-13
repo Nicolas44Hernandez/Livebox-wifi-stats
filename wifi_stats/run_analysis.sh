@@ -8,6 +8,7 @@ declare -a LOG_FILES=("chanim_stats.log"
                       "switch_band.log"
                       "telnet.log"
                       "antenas_tx_rx_stats.log"
+                      "result_files_generation.log"
                       "setup/setup.log"
                       )
 
@@ -115,10 +116,11 @@ do
 done
 
 # Generate requested throughput file
-requested_traffic_result_file="analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/analysis_results/requested_throughput.txt"
+requested_traffic_result_file="analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/results/analysis_results"
 traffic_log_file="logs/files_transfer.log"
-echo Schedule task Generate requested throughput file $requested_traffic_result_file
-echo "python3 traffic_file_generation.py -tf $traffic_log_file -rf $requested_traffic_result_file -lc $LOGGING_CONFIG_FILE" | at now +$GENERATE_REQUESTED_TRAFFIC_FILE_TIME minutes
+antenas_log_file="logs/antenas_tx_rx_stats.log"
+echo Schedule task to Generate result files $requested_traffic_result_file
+echo "python3 results.py -tf $traffic_log_file -af $antenas_log_file -rd $requested_traffic_result_file -sc $STATIONS_CONFIG -lc $LOGGING_CONFIG_FILE" | at now +$GENERATE_REQUESTED_TRAFFIC_FILE_TIME minutes
 
 # Move smokeping results to results folder
 echo "sudo systemctl stop apache2 smokeping" | at now +$RESULTS_EXTRACTION_TIME minutes

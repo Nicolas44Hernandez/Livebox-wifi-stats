@@ -108,6 +108,10 @@ def write_single_station_info(
                 value = line.split(col)[1][1:].replace("= ", "")
                 if "smoothed" in col:
                     logger.info(f"smoothed rssi: {value}")
+                if "tx" in col:
+                    logger.info(f"tx bytes: {value}")
+                if "rx" in col:
+                    logger.info(f"rx bytes: {value}")
                 if i != 0:
                     new_entry += "    "
                 new_entry += f"{value}"

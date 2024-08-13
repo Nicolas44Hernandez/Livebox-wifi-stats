@@ -38,6 +38,13 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
+  results_files_generation:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/result_files_generation.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
   info_stations:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -99,24 +106,29 @@ loggers:
     handlers: [__main__]
     propagate: no
 
-  traffic_file_generation:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
   programs.chanim_stats:
     level: DEBUG
     handlers: [chanim_stats]
     propagate: no
 
   programs.tx_rx_stats:
-    level: DEBUG
+    level: INFO
     handlers: [antenas_tx_rx_stats]
     propagate: no
 
   programs.files_transfer:
     level: DEBUG
     handlers: [files_transfer]
+    propagate: no
+
+  programs.results.traffic_file_generation:
+    level: DEBUG
+    handlers: [results_files_generation]
+    propagate: no
+
+  programs.results.antenas_througput_file_generation:
+    level: DEBUG
+    handlers: [results_files_generation]
     propagate: no
 
   programs.calibration.initial_calibrate_stations:

@@ -69,6 +69,45 @@ def generate_station_throughputs_sequence_for_period(
 
     return full_list
 
+def generate_station_triangular_throughputs_sequence_for_period(
+        total_number_of_elements: int = 1000,
+        step: int=1,
+        upsize: int=5
+    ):
+    """
+    Generate a triangular test list of throughputs for a station
+    """
+    full_list = []
+    while len(full_list) < total_number_of_elements:
+        # Generate new list
+        new_list = []
+        for n in range(upsize):
+            new_list.append(n*step)
+
+        # Concatenate elements to list
+        if len(new_list) + len(full_list) <= total_number_of_elements:
+            full_list = full_list + new_list
+        else:
+            elements_to_concatenate = total_number_of_elements - len(full_list)
+            full_list = full_list + new_list[:elements_to_concatenate]
+
+    return full_list
+
+
+def generate_constant_throughputs_sequence_for_period(
+        total_number_of_elements: int = 1000,
+        value: float=1,
+    ):
+    """
+    Generate a constant test list of throughputs for a station
+    """
+    full_list = []
+    for n in range(total_number_of_elements):
+            full_list.append(value)
+    return full_list
+
+
+
 def generate_random_throughputs_for_stations(
     number_of_files_to_send_per_period,
     periods,
@@ -100,6 +139,19 @@ def generate_random_throughputs_for_stations(
                 sample_size=sample_size,
                 total_number_of_elements=number_of_files_to_send_per_period
             )
+
+            ############################### FOR TEST ###############################
+            # throughput_for_station = generate_station_triangular_throughputs_sequence_for_period(
+            #     total_number_of_elements=number_of_files_to_send_per_period,
+            #     step=1,
+            #     upsize=10,
+            # )
+
+            # throughput_for_station = generate_constant_throughputs_sequence_for_period(
+            #     total_number_of_elements=number_of_files_to_send_per_period,
+            #     value=1
+            # )
+            #########################################################################
 
             # Append throughput for period
             throughputs_dict[station]["throughputs"] += throughput_for_station

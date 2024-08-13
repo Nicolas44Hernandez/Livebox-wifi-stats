@@ -93,7 +93,9 @@ def retrieve_antena_stats_from_livebox(telnet: Telnet,columns: Iterable[str], ba
 
     # Format retrieved results
     antena_stats_result = ""
-
+    txbyte = antena_stats_result_dict["txbyte"]
+    rxbyte = antena_stats_result_dict["rxbyte"]
+    logger.info(f"BAND: {band} txbyte: {txbyte} rxbyte: {rxbyte}")
     for idx, key in enumerate(columns):
         if key in antena_stats_result_dict:
             if idx == 0:

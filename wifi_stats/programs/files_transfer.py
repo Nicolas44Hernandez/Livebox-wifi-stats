@@ -5,6 +5,7 @@ Send files continuously to stations in order to create traffic in the network.
 from datetime import datetime, timedelta
 from threading import Thread, Event
 import os
+import signal
 import pexpect
 import subprocess
 from typing import Iterable
@@ -96,21 +97,36 @@ def transfer_file_scp(
     # Generate transfert scp command
     if transfer_from_station:
         file_to_get = _file.split("/")[-2] + "/" + _file.split("/")[-1]
-        command = (
-            f"sshpass -p '{ssh_password}' scp -l {data_rate_kbps} {ssh_usr}@{station_ip}:files_transfer/{file_to_get} file_{station_name}.txt"
-        )
+        command = [
+            "sshpass",
+            "-p",
+            f"{ssh_password}",
+            "scp",
+            "-l",
+            f"{data_rate_kbps}",
+            f"{ssh_usr}@{station_ip}:files_transfer/{file_to_get}",
+            f"file_{station_name}.txt"
+        ]
     else:
-        command = (
-            f"sshpass -p '{ssh_password}' scp -l {data_rate_kbps} {_file} {ssh_usr}@{station_ip}:files_transfer/file.txt"
-        )
-    # Log generated command
-    logger.info(f"command: {command}")
+        command = [
+            f"sshpass",
+            "-p",
+            f"{ssh_password}",
+            "scp",
+            "-l",
+            f"{data_rate_kbps}",
+            f"{_file}",
+            f"{ssh_usr}@{station_ip}:files_transfer/file.txt",
+        ]
 
     # Execute command
     try:
-        subprocess.call(command, shell=True, timeout=transfer_max_duration)
+        p = subprocess.Popen(command, start_new_session=True)
+        p.wait(timeout=transfer_max_duration)
+
     except subprocess.TimeoutExpired:
         logger.info("Transfert end timer")
+        os.killpg(os.getpgid(p.pid), signal.SIGTERM)
     else:
         logger.info("Transfert completed")
     return True
@@ -149,6 +165,7 @@ def transfer_file_sftp(
     except Exception as e:
         logger.error("Error in connection")
         child.close()
+        child.terminate(force=True)
         return False
 
     # Get end connection timestamp
@@ -158,6 +175,11 @@ def transfer_file_sftp(
     _delta = (_end - _start).total_seconds()
     remaining_time_for_transfert = transfer_max_duration - _delta
     logger.info(f"Remaining time for transfert: {remaining_time_for_transfert}")
+    if remaining_time_for_transfert < 0:
+        logger.error("No time for transfert")
+        child.close()
+        child.terminate(force=True)
+        return False
 
     transfer_from_station = True if transfer_direction == "uplink" else False
 
@@ -181,11 +203,12 @@ def transfer_file_sftp(
         child.expect("sftp> ", timeout=remaining_time_for_transfert)
         # Close connection
         child.sendline("exit")
-        child.close()
     except Exception:
         logger.info("Transfert end timer")
     else:
         logger.info("Transfert completed")
+    child.close()
+    child.terminate(force=True)
     return True
 
 def transfer_file(
@@ -206,7 +229,6 @@ def transfer_file(
 
     # Get station params
     transfer_protocol = station["protocol"]
-    transfer_from_station = True if transfer_direction == "uplink" else False
 
     # Get transfert params
     data_rate_kbps = int(throughput * 1000)

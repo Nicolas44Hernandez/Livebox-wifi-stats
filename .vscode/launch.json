@@ -5,28 +5,45 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "GENERATE REQUESTED THROUGHPUT RESULT FILES",
-            "type": "python",
+            "name": "GENERATE RESULTS FILES FROM LOGS",
+            "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/traffic_file_generation.py",
+            "program": "${workspaceFolder}/wifi_stats/results.py",
             "console": "integratedTerminal",
             "args": [
                 "-tf",
-                "${workspaceFolder}/wifi_stats/analyses_results/CAMP_4_PRE1/2023-09-20_10-49/logs/files_transfer.log",
-                "-rf",
-                "${workspaceFolder}/test_file.txt",
+                "${workspaceFolder}/wifi_stats/analyses_results/CAMP_4_TEST1/2023-09-27_16-30/logs/files_transfer.log",
+                "-af",
+                "${workspaceFolder}/wifi_stats/analyses_results/CAMP_4_TEST1/2023-09-27_16-30/logs/antenas_tx_rx_stats.log",
+                "-rd",
+                "${workspaceFolder}",
+                "-sc",
+                "${workspaceFolder}/wifi_stats/config/stations.yml",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging.yml",
+            ]
+        },
+        {
+            "name": "REAL TRAFFIC: Plot real traffic",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/real_traffic.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-rd",
+                "${workspaceFolder}/wifi_stats/analyses_results/TEST_CAMP5_PRPL/2024-08-13_11-54/results/analysis_results",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]
         },
         {
             "name": "SETUP ANALYSIS",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/setup.py",
             "console": "integratedTerminal",
             "args": [
-                //"--generate-files",
+                "--generate-files",
                 "-sc",
                 "${workspaceFolder}/wifi_stats/config/stations.yml",
                 "-nf", // samples per period
@@ -47,7 +64,7 @@
         },
         {
             "name": "STATIONS CALIBRATION",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/calibration.py",
             "console": "integratedTerminal",
@@ -55,7 +72,7 @@
                 "-n",
                 "livebox_nico_test",
                 "-l",
-                "192.168.1.1",
+                "192.168.144.1",
                 "-u",
                 "root",
                 "-pw",
@@ -68,7 +85,7 @@
         },
         {
             "name": "LIVEBOX COUNTERTS LOG",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/log_livebox_counters.py",
             "console": "integratedTerminal",
@@ -85,7 +102,7 @@
         },
         {
             "name": "RUN ANALYSIS: Files transfer",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
@@ -97,9 +114,9 @@
                 "-tcf",
                 "${workspaceFolder}/wifi_stats/config/traffic_config_file.yml",
                 "-d",
-                "8",
+                "3",
                 "-td",
-                "22",
+                "10",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
                 "-rd",
@@ -108,7 +125,7 @@
         },
         {
             "name": "RUN ANALYSIS: chanim stats",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
@@ -137,7 +154,7 @@
         },
         {
             "name": "RUN ANALYSIS: static data",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
@@ -162,7 +179,7 @@
         },
         {
             "name": "RUN ANALYSIS: info_stations_stats",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
@@ -193,7 +210,7 @@
         },
         {
             "name": "RUN ANALYSIS: rx_tx_stats",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
@@ -224,7 +241,7 @@
         },
         {
             "name": "RUN ANALYSIS: switch band 5GHz",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
