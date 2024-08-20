@@ -238,37 +238,6 @@
                 "-ts",
                 "2022-12-14_12-57",
             ]
-        },
-        {
-            "name": "RUN ANALYSIS: switch band 5GHz",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/main.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-p",
-                "switch_5GHz",
-                "-n",
-                "livebox_nico_test",
-                "-l",
-                "192.168.1.1",
-                "-u",
-                "root",
-                "-pw",
-                "sah",
-                "-d",
-                "2",
-                "-on",
-                "40",
-                "-off",
-                "30",
-                "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sda1",
-                "-ts",
-                "2022-12-14_12-57",
-            ]
-        },
+        }
     ]
 }

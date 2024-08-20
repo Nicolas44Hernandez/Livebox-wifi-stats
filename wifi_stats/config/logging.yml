@@ -52,13 +52,6 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
-  switch_band:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/switch_band.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
-
   chanim_stats:
     class: logging.handlers.RotatingFileHandler
     formatter: default
@@ -149,11 +142,6 @@ loggers:
   programs.static_data:
     level: DEBUG
     handlers: [static_data]
-    propagate: no
-
-  programs.switch_5GHz:
-    level: DEBUG
-    handlers: [switch_band]
     propagate: no
 
   common.telnet:

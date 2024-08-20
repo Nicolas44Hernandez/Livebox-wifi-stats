@@ -5,7 +5,6 @@ declare -a LOG_FILES=("chanim_stats.log"
                       "info_stations.log"
                       "main.log"
                       "static_data.log"
-                      "switch_band.log"
                       "telnet.log"
                       "antenas_tx_rx_stats.log"
                       "result_files_generation.log"
@@ -31,7 +30,6 @@ echo Logging config file: $LOGGING_CONFIG_FILE
 echo Connected stations results config file: $CONNECTED_STATIONS_RESULTS_CONFIG
 echo Antenas stats results config file: $ANTENAS_RESULTS_CONFIG
 echo USB results device: $USB_RESULTS_DEVICE
-echo Switch 5GHz band: $SWITCH_5GHZ_BAND
 echo 5GHZ band ON period: $WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS
 echo 5GHZ band OFF period: $WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS
 echo Sampling period for info request: $SAMPLING_PERIOD_IN_SECS
@@ -82,12 +80,6 @@ python3 main.py -p chanim_stats -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USE
 
 echo  Running program: ANTENAS STATS
 python3 main.py -p antenas -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -ac $ANTENAS_RESULTS_CONFIG -ts $ANALYSIS_TIMESTAMP &
-
-if [ "$SWITCH_5GHZ_BAND" = true ]; then
-    echo  Running program: SWITCH BAND 5GHz
-    python3 main.py -p switch_5GHz -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -on $WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS -off $WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -ts $ANALYSIS_TIMESTAMP &
-
-fi
 
 echo  Running program: INFO STATIONS STATS
 python3 main.py -p stations -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -sc $CONNECTED_STATIONS_RESULTS_CONFIG -ts $ANALYSIS_TIMESTAMP &

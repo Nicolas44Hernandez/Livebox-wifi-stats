@@ -8,7 +8,6 @@ from common import Telnet
 from programs.chanim_stats import run_chanim_stats
 from programs.static_data import run_static_data
 from programs.info_connected_stations import run_info_connected_stations
-from programs.switch_5GHz import run_switch_5GHz
 from programs.files_transfer import run_files_transfer
 from programs.tx_rx_stats import run_tx_rx_stats
 
@@ -36,8 +35,6 @@ def main():
         -d      --duration                 Analysis duration in mins
         -td     --transfert_duration       Transfert duration in secs
         -sp     --sampling_period_in_secs  Sampling period for information request
-        -on     --on_period_in_secs        5GHz band ON period in secs
-        -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
         -rd     --results_disk             External USB disk for analysis results
     """
@@ -135,20 +132,6 @@ def main():
     )
 
     parser.add_argument(
-        "-on",
-        "--on_period_in_secs",
-        type=int,
-        help="5GHz band ON period in secs",
-    )
-
-    parser.add_argument(
-        "-off",
-        "--off_period_in_secs",
-        type=int,
-        help="5GHz band ON period in secs",
-    )
-
-    parser.add_argument(
         "-lc",
         "--logs_config",
         type=str,
@@ -192,16 +175,6 @@ def main():
     # Run program
     if args.program == "static_livebox_data":
         run_static_data(telnet=telnet, results_dir=results_dir)
-        return
-
-    if args.program == "switch_5GHz":
-        run_switch_5GHz(
-            telnet=telnet,
-            results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration,
-            on_period_in_secs=args.on_period_in_secs,
-            off_period_in_secs=args.off_period_in_secs,
-        )
         return
 
     if args.program == "chanim_stats":

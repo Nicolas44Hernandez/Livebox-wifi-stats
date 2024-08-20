@@ -87,11 +87,6 @@ loggers:
     handlers: [console]
     propagate: no
 
-  programs.switch_5GHz:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
   common.telnet:
     level: DEBUG
     handlers: [console]
