@@ -3,18 +3,13 @@
 import logging
 from logging.config import dictConfig
 import yaml
+import os
 import argparse
-from common import Telnet
-from programs.chanim_stats import run_chanim_stats
+from common import SshClient
+from programs.radio_stats import run_radio_stats
 from programs.static_data import run_static_data
-from programs.info_connected_stations import run_info_connected_stations
-from programs.switch_5GHz import run_switch_5GHz
+from programs.stations_stats import run_info_connected_stations
 from programs.files_transfer import run_files_transfer
-from programs.tx_rx_stats import run_tx_rx_stats
-
-USB_DEVICE_PATH = "/var/usbmount/kernel::"
-RESULTS_DIR = "wifi_stats_results"
-
 
 logger = logging.getLogger(__name__)
 
@@ -30,16 +25,13 @@ def main():
         -pw     --password                 Telnet connection password
         -scf    --stations_config          Config file for stations
         -tcf    --traffic_config           Config file for analysis traffic
-        -ts     --timestamp                Analysis timestamp for results file
         -sc     --stations_columns_config  Config file for the result table in info stations program
-        -ac     --antenas_columns_config   Config file for the result table in tx_rx_stats program
+        -rc     --radio_columns_config     Config file for the result table in radio counters program
         -d      --duration                 Analysis duration in mins
         -td     --transfert_duration       Transfert duration in secs
         -sp     --sampling_period_in_secs  Sampling period for information request
-        -on     --on_period_in_secs        5GHz band ON period in secs
-        -off    --off_period_in_secs       5GHz band OFF period in secs
         -lc     --logs_config              Logs configuration
-        -rd     --results_disk             External USB disk for analysis results
+        -rf     --results_folder           Results folder
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
@@ -93,13 +85,6 @@ def main():
     )
 
     parser.add_argument(
-        "-ts",
-        "--timestamp",
-        type=str,
-        help="Analysis timestamp for results file",
-    )
-
-    parser.add_argument(
         "-sc",
         "--stations_columns_config",
         type=str,
@@ -107,10 +92,10 @@ def main():
     )
 
     parser.add_argument(
-        "-ac",
-        "--antenas_columns_config",
+        "-rc",
+        "--radio_columns_config",
         type=str,
-        help="Config file for the result table in tx_rx_stats program",
+        help="Config file for the result table in radio counters program",
     )
 
     parser.add_argument(
@@ -135,20 +120,6 @@ def main():
     )
 
     parser.add_argument(
-        "-on",
-        "--on_period_in_secs",
-        type=int,
-        help="5GHz band ON period in secs",
-    )
-
-    parser.add_argument(
-        "-off",
-        "--off_period_in_secs",
-        type=int,
-        help="5GHz band ON period in secs",
-    )
-
-    parser.add_argument(
         "-lc",
         "--logs_config",
         type=str,
@@ -156,10 +127,10 @@ def main():
     )
 
     parser.add_argument(
-        "-rd",
-        "--results_disk",
+        "-rf",
+        "--results_folder",
         type=str,
-        help="External USB disk for analysis results",
+        help="Results folder",
     )
 
     # Parse args
@@ -181,55 +152,36 @@ def main():
         )
         return
 
-    # Create telnet instance
-    telnet = Telnet(host=args.livebox, login=args.user, password=args.password)
+    # Verify results folder exists
+    if not os.path.isdir(args.results_folder):
+        logger.error("Results folder doesnt exist")
+        return
 
-    # Create results dir
-    device = f"/var/usbmount/kernel::{args.results_disk}/"
-    results_dir = telnet.create_results_dir(
-        timestamp=args.timestamp, device=device, results_directory=RESULTS_DIR, box_name=args.name)
+    # Create ssh interface
+    ssh = SshClient(host=args.livebox, user=args.user, password=args.password)
 
     # Run program
     if args.program == "static_livebox_data":
-        run_static_data(telnet=telnet, results_dir=results_dir)
-        return
-
-    if args.program == "switch_5GHz":
-        run_switch_5GHz(
-            telnet=telnet,
-            results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration,
-            on_period_in_secs=args.on_period_in_secs,
-            off_period_in_secs=args.off_period_in_secs,
-        )
-        return
-
-    if args.program == "chanim_stats":
-        run_chanim_stats(
-            telnet=telnet,
-            results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration,
-            sampling_period_in_seconds=args.sampling_period_in_secs
-        )
+        run_static_data(ssh=ssh, results_dir=args.results_folder)
         return
 
     if args.program == "stations":
         run_info_connected_stations(
-            telnet=telnet,
-            results_dir=results_dir,
+            ssh=ssh,
+            results_dir=args.results_folder,
             analysis_duration_in_minutes=args.duration,
             sampling_period_in_seconds=args.sampling_period_in_secs,
             columns_config_file=args.stations_columns_config,
         )
         return
 
-    if args.program == "antenas":
-        run_tx_rx_stats(
-            telnet=telnet,
-            results_dir=results_dir,
+    if args.program == "livebox_counters":
+        run_radio_stats(
+            ssh=ssh,
+            results_dir=args.results_folder,
+            columns_config_file=args.radio_columns_config,
             analysis_duration_in_minutes=args.duration,
-            sampling_period_in_seconds=args.sampling_period_in_secs,
-            columns_config_file=args.antenas_columns_config,
+            sampling_period_in_seconds=args.sampling_period_in_secs
         )
         return
 

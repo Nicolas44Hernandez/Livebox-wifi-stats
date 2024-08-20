@@ -1,0 +1,73 @@
+version: 1
+disable_existing_loggers: true
+
+formatters:
+  default:
+    format: "%(asctime)s [%(threadName)s] [%(levelname)s] %(name)s: %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+
+  __main__:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/main.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+root:
+  level: WARN
+  handlers: [console]
+
+loggers:
+  __main__:
+    level: DEBUG
+    handlers: [__main__]
+    propagate: no
+
+  programs.calibration.initial_calibrate_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.setup.generate_files:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.setup.generate_traffic_config:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.setup.initial_transfer_files_to_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.results.requested_traffic:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.static_data:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.files_transfer:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.radio_stats:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.stations_stats:
+    level: INFO
+    handlers: [console]
+    propagate: no

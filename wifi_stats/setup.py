@@ -8,10 +8,6 @@ from programs.setup.generate_files import run_generate_random_files
 from programs.setup.initial_transfer_files_to_stations import run_initial_files_transfer_to_stations
 from programs.setup.generate_traffic_config import run_generate_traffic_config
 
-USB_DEVICE_PATH = "/var/usbmount/kernel::"
-RESULTS_DIR = "wifi_stats_results"
-
-
 logger = logging.getLogger(__name__)
 
 
