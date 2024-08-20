@@ -1,45 +1,100 @@
 COLUMNS:
-  - chanspec
-  - aid
-  - rateset
-  - idle
-  - in network
-  - state
-  - connection
-  - auth
-  - crypto
-  - flags
-  - tx total pkts
-  - tx total bytes
-  - tx ucast pkts
-  - tx ucast bytes
-  - tx mcast/bcast pkts
-  - tx mcast/bcast bytes
-  - tx failures
-  - rx data pkts
-  - rx data bytes
-  - rx data dur
-  - rx ucast pkts
-  - rx ucast bytes
-  - rx mcast/bcast pkts
-  - rx mcast/bcast bytes
-  - rate of last tx pkt
-  - rate of last rx pkt
-  - rx decrypt succeeds
-  - rx decrypt failures
-  - tx data pkts retried
-  - per antenna rssi of last rx data frame
-  - per antenna average rssi of rx data frames
-  - per antenna noise floor
-  - tx total pkts sent
-  - tx pkts retries
-  - tx pkts retry exhausted
-  - tx FW total pkts sent
-  - tx FW pkts retries
-  - tx FW pkts retry exhausted
-  - rx total pkts retried
-  - smoothed rssi
-  - link bandwidth
-  - Max Rate
-  - RRM capability
-  - Frequency Bands Supported
+  - Active
+  - AssociationTime
+  - AuthenticationState
+  - AvgSignalStrength
+  - AvgSignalStrengthByChain
+  - Capabilities
+  - ChargeableUserId
+  - ConnectionDuration
+  - DevicePriority
+  - DeviceType
+  - DisassociationTime
+  - DownlinkBandwidth
+  - DownlinkMCS
+  - DownlinkRateSpec
+  - DownlinkShortGuard
+  - EncryptionMode
+  - FrequencyCapabilities
+  - HeCapabilities
+  - HtCapabilities
+  - Inactive
+  - LastDataDownlinkRate
+  - LastDataUplinkRate
+  - LastStateChange
+  - LinkBandwidth
+  - MACAddress
+  - MUGroupId
+  - MUMimoTxPktsCount
+  - MUMimoTxPktsPercentage
+  - MUUserPositionId
+  - MaxBandwidthSupported
+  - MaxDownlinkRateReached
+  - MaxDownlinkRateSupported
+  - MaxRxSpatialStreamsSupported
+  - MaxTxSpatialStreamsSupported
+  - MaxUplinkRateReached
+  - MaxUplinkRateSupported
+  - Noise
+  - OperatingStandard
+  - PowerSave
+  - Retransmissions
+  - RrmCapabilities
+  - RrmOffChannelMaxDuration
+  - RrmOnChannelMaxDuration
+  - RxBytes
+  - RxMulticastPacketCount
+  - RxPacketCount
+  - RxSupportedHe160MCS
+  - RxSupportedHe80x80MCS
+  - RxSupportedHeMCS
+  - RxSupportedVhtMCS
+  - RxUnicastPacketCount
+  - Rx_Retransmissions
+  - Rx_RetransmissionsFailed
+  - SecurityModeEnabled
+  - SignalNoiseRatio
+  - SignalStrength
+  - SignalStrengthByChain
+  - SignalStrengthHistory
+  - SupportedHtMCS
+  - SupportedMCS
+  - TxBytes
+  - TxErrors
+  - TxMulticastPacketCount
+  - TxPacketCount
+  - TxSupportedHe160MCS
+  - TxSupportedHe80x80MCS
+  - TxSupportedHeMCS
+  - TxSupportedVhtMCS
+  - TxUnicastPacketCount
+  - Tx_Retransmissions
+  - Tx_RetransmissionsFailed
+  - UNIIBandsCapabilities
+  - UplinkBandwidth
+  - UplinkMCS
+  - UplinkRateSpec
+  - UplinkShortGuard
+  - VendorOUI
+  - VhtCapabilities
+  - EncryptionMode
+  - FrequencyCapabilities
+  - HeCapabilities
+  - HtCapabilities
+  - LinkBandwidth
+  - RrmCapabilities
+  - RrmOffChannelMaxDuration
+  - RrmOnChannelMaxDuration
+  - RxSupportedHe160MCS
+  - RxSupportedHe80x80MCS
+  - RxSupportedHeMCS
+  - RxSupportedVhtMCS
+  - SecurityModeEnabled
+  - SupportedHtMCS
+  - SupportedMCS
+  - TxSupportedHe160MCS
+  - TxSupportedHe80x80MCS
+  - TxSupportedHeMCS
+  - TxSupportedVhtMCS
+  - VendorOUI
+  - VhtCapabilities

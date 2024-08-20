@@ -1,12 +1,12 @@
 """
-Retrieve stats from stations connected to the 2.4 GHz and 5 GHz frequency band by ussing the commands:
-* wl -i wl0 assoclist
-* wl info_sta
+Retrieve stats from stations connected to the 2.4 GHz and 5 GHz frequency bands
+Stats are logged in result files
 """
 
 from datetime import datetime, timedelta
 import logging
 import time
+import os
 from common import Telnet, SshClient
 import yaml
 
@@ -41,22 +41,10 @@ def get_columns(config_file: str):
 
     return columns
 
-
-def check_if_results_file_exists(telnet: Telnet, file: str):
-    """Check if result file already exists"""
-
-    check_if_file_exists_command = COMMANDS["check if file exists"].replace(
-        "FILE", file)
-    _result_brut = telnet.send_command_and_read_result(
-        check_if_file_exists_command)
-    result = str(parse_telnet_output(_result_brut))
-    return "exists" in result
-
-
 def write_single_station_info(
-    telnet: Telnet,
+    ssh: SshClient,
     columns_conf: str,
-    mac_addr: str,
+    station: dict,
     wifi_band: str,
     date_time: str,
     results_dir: str
@@ -64,70 +52,42 @@ def write_single_station_info(
     """
     Append station info to dedicated result file, if the file doenst exists creates a file with the headers
     """
-
-    formatted_mac = mac_addr.replace(":", "_")
+    mac_address = station["MACAddress"].replace("\"", "")
+    formatted_mac = mac_address.replace(":", "_")
     file_name = f"{results_dir}/{RESULTS_FILE_INFO_STATION}{formatted_mac}.txt"
-    output_redirection_command = f" >> {file_name}"
 
     # get table columns
     columns = get_columns(config_file=columns_conf)
 
-    if not check_if_results_file_exists(telnet=telnet, file=file_name):
-        header = ""
-        for i, col in enumerate(columns):
-            if i != 0:
-                header += "    "
-            header += col
-        # add wifiband and datetime
-        header = f"{header}    band_wifi    date_time"
+    # Create station results file if doesnt exist and append header
+    file_exists = os.path.isfile(file_name)
+    if not file_exists:
+        try:
+            with open(file_name, 'x') as file:
+                header = ""
+                for key in columns:
+                    header+=f"{key}\t"
+                header+=f"wifi-band\tdatetime\n"
+                file.write(header)
+                logger.info(f"{file_name} results file created")
+        except FileExistsError:
+            logger.info(f"The file '{file_name}' already exists.")
 
-        # Write header
-        write_header_command = f"echo '{header}' {output_redirection_command}"
-        telnet.send_command(write_header_command)
-
-    # retrieve station info
-    sta_info_command = COMMANDS["get station info"].replace(
-        "MAC_ADDRESS", mac_addr)
-    if wifi_band == "5GHz":
-        sta_info_command = sta_info_command.replace("BAND", "wl0")
-    elif wifi_band == "2.4GHz":
-        sta_info_command = sta_info_command.replace("BAND", "wl2")
-    else:
-        sta_info_command = sta_info_command.replace("BAND", "wl1")
-    station_info_result_brut = telnet.send_command_and_read_result(
-        sta_info_command)
-    _raw_station_info = str(parse_telnet_output(
-        station_info_result_brut)).split("\r\n")[1:-1]
-
-    # create entry
-    new_entry = ""
-    for i, col in enumerate(columns):
-        for line in _raw_station_info:
-            if col in line:
-                value = line.split(col)[1][1:].replace("= ", "")
-                if "smoothed" in col:
-                    logger.info(f"smoothed rssi: {value}")
-                if "tx" in col:
-                    logger.info(f"tx bytes: {value}")
-                if "rx" in col:
-                    logger.info(f"rx bytes: {value}")
-                if i != 0:
-                    new_entry += "    "
-                new_entry += f"{value}"
-                continue
-
-    if new_entry == "":
-        return
-
-    # add wifiband and datetime
-    new_entry = f"{new_entry}    {wifi_band}    {date_time}"
-    # Write entry
-    write_stations_info_command = f"echo -e \"{new_entry}\" {output_redirection_command}"
-    telnet.send_command(write_stations_info_command)
+    # Create new entry with station info
+    with open(file_name, 'a') as file:
+        new_entry = ""
+        for key in columns:
+            if key in station:
+                new_entry += f"{station[key]}\t"
+            else:
+                new_entry += f"None\t"
+        new_entry += f"{wifi_band}\t{date_time}\n"
+        # Append new entry to file
+        file.write(new_entry)
 
 
 def write_stations_info_in_file(
-    telnet: Telnet,
+    ssh: SshClient,
     results_dir: str,
     connections_2_4GHz: int,
     connections_5GHz: int,
@@ -139,9 +99,9 @@ def write_stations_info_in_file(
     # loop over stations connected to 2.4GHz band
     for station in connections_2_4GHz:
         write_single_station_info(
-            telnet=telnet,
+            ssh=ssh,
             columns_conf=columns_conf,
-            mac_addr=station,
+            station=station,
             wifi_band="2.4GHz",
             date_time=date_time,
             results_dir=results_dir
@@ -149,9 +109,9 @@ def write_stations_info_in_file(
     # loop over stations connected to 5GHZ band
     for station in connections_5GHz:
         write_single_station_info(
-            telnet=telnet,
+            ssh=ssh,
             columns_conf=columns_conf,
-            mac_addr=station,
+            station=station,
             wifi_band="5GHz",
             date_time=date_time,
             results_dir=results_dir
@@ -159,8 +119,8 @@ def write_stations_info_in_file(
 
 
 def write_nb_connections_in_file(
-    telnet: Telnet,
-    results_dir: str,
+    ssh: SshClient,
+    results_file: str,
     connections_number: int,
     connections_2_4GHz: int,
     connections_5GHz: int
@@ -168,21 +128,17 @@ def write_nb_connections_in_file(
     """
     Write the number of connected stations for each band in the dedicated results file
     """
-
-    # redirection to file command
-    output_redirection_command = " >> " + results_dir + \
-        "/" + RESULTS_FILE_CONNECTIONS_NUMBER
-
-    # Write connected stations command
+    # Write connected stations info
     date_time = str(datetime.now())
 
     # create entry
-    new_entry = f"{connections_number}    {connections_5GHz}    {connections_2_4GHz}    {date_time}"
+    new_entry = f"{connections_number}    {connections_5GHz}    {connections_2_4GHz}    {date_time}\n"
     # Write entry
-    write_connected_stations_command = f"echo -e \"{new_entry}\" {output_redirection_command}"
-    # Send command
-    telnet.send_command(write_connected_stations_command)
-
+    try:
+        with open(results_file, 'a') as file:
+            file.write(new_entry)
+    except Exception:
+        logger.error(f"Error when appending to results file")
 
 def parse_telnet_output(raw_output: str):
     """Parse the output of the sent command"""
@@ -226,7 +182,6 @@ def get_connected_stations_in_band(ssh: SshClient, band: str):
     return active_stations
 
 
-# TODO: dont pass ssh client but connection info ?
 def get_connected_stations(ssh: SshClient):
     """Retrive the list of mac addresses of the stations connected to each frequency band"""
     # Get connected stations
@@ -253,7 +208,7 @@ def band_is_up(ssh: SshClient, band: str):
 
 
 def run_info_connected_stations(
-    telnet: Telnet,
+    ssh: SshClient,
     results_dir: str,
     analysis_duration_in_minutes: int,
     sampling_period_in_seconds: int,
@@ -267,11 +222,18 @@ def run_info_connected_stations(
     estimated_end = start + timedelta(minutes=analysis_duration_in_minutes)
     logger.info(f"Estimated end: {str(estimated_end)}")
 
-    # Write header
-    output_redirection_command = " >> " + results_dir + \
-        "/" + RESULTS_FILE_CONNECTIONS_NUMBER
-    write_header_command = COMMANDS['get header'] + output_redirection_command
-    telnet.send_command(write_header_command)
+    # Create connected stations results file
+    results_file_path = f"{results_dir}/{RESULTS_FILE_CONNECTIONS_NUMBER}"
+
+    try:
+        with open(results_file_path, 'x') as file:
+            # Write header
+            header = "connected    2.4GHz    5GHz    datetime\n"
+            file.write(header)
+            logger.info(f"{results_file_path} results file created")
+    except FileExistsError:
+        logger.error(f"The file '{results_file_path}' already exists.")
+
 
     # Waiting loop
     now = datetime.now()
@@ -279,22 +241,21 @@ def run_info_connected_stations(
         next_sample_at = now + timedelta(seconds=sampling_period_in_seconds)
 
         # Get number of connected stations
-        total_connections, connected_stations_2_4GHz, connected_stations_5GHz = get_connected_stations(
-            telnet)
+        total_connections, connected_stations_2_4GHz, connected_stations_5GHz = get_connected_stations(ssh)
         logger.info(
-            f"Connected stations: {total_connections} 2.4GHz band: {connected_stations_2_4GHz} 5GHz band: {connected_stations_5GHz}")
+            f"Connected stations: {total_connections} 2.4GHz band: {len(connected_stations_2_4GHz)} 5GHz band: {len(connected_stations_5GHz)}")
 
         # Write number of connections in dedicated file
         write_nb_connections_in_file(
-            telnet=telnet,
-            results_dir=results_dir,
+            ssh=ssh,
+            results_file=results_file_path,
             connections_number=total_connections,
             connections_2_4GHz=len(connected_stations_2_4GHz),
             connections_5GHz=len(connected_stations_5GHz),
         )
         if total_connections > 0:
             write_stations_info_in_file(
-                telnet=telnet,
+                ssh=ssh,
                 results_dir=results_dir,
                 connections_2_4GHz=connected_stations_2_4GHz,
                 connections_5GHz=connected_stations_5GHz,

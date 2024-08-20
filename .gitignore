@@ -5,6 +5,7 @@ logs
 # random files to send
 files_to_send
 analyses_results
+test_results_dir
 
 # random files to send
 historic_results

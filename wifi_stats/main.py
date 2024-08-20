@@ -3,17 +3,14 @@
 import logging
 from logging.config import dictConfig
 import yaml
+import os
 import argparse
-from common import Telnet
+from common import SshClient
 from programs.chanim_stats import run_chanim_stats
 from programs.static_data import run_static_data
 from programs.info_connected_stations import run_info_connected_stations
 from programs.files_transfer import run_files_transfer
 from programs.tx_rx_stats import run_tx_rx_stats
-
-USB_DEVICE_PATH = "/var/usbmount/kernel::"
-RESULTS_DIR = "wifi_stats_results"
-
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +33,7 @@ def main():
         -td     --transfert_duration       Transfert duration in secs
         -sp     --sampling_period_in_secs  Sampling period for information request
         -lc     --logs_config              Logs configuration
-        -rd     --results_disk             External USB disk for analysis results
+        -rf     --results_folder           Results folder
     """
     parser = argparse.ArgumentParser(prog="WiFi-stats")
 
@@ -139,10 +136,10 @@ def main():
     )
 
     parser.add_argument(
-        "-rd",
-        "--results_disk",
+        "-rf",
+        "--results_folder",
         type=str,
-        help="External USB disk for analysis results",
+        help="Results folder",
     )
 
     # Parse args
@@ -164,47 +161,47 @@ def main():
         )
         return
 
-    # Create telnet instance
-    telnet = Telnet(host=args.livebox, login=args.user, password=args.password)
-
-    # Create results dir
-    device = f"/var/usbmount/kernel::{args.results_disk}/"
-    results_dir = telnet.create_results_dir(
-        timestamp=args.timestamp, device=device, results_directory=RESULTS_DIR, box_name=args.name)
-
-    # Run program
-    if args.program == "static_livebox_data":
-        run_static_data(telnet=telnet, results_dir=results_dir)
+    # Verify results folder exists
+    if not os.path.isdir(args.results_folder):
+        logger.error("Results folder doesnt exist")
         return
 
-    if args.program == "chanim_stats":
-        run_chanim_stats(
-            telnet=telnet,
-            results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration,
-            sampling_period_in_seconds=args.sampling_period_in_secs
-        )
-        return
+    # Create ssh interface
+    ssh = SshClient(host=args.livebox, user=args.user, password=args.password)
+
+    # # Run program
+    # if args.program == "static_livebox_data":
+    #     run_static_data(telnet=telnet, results_dir=results_dir)
+    #     return
+
+    # if args.program == "chanim_stats":
+    #     run_chanim_stats(
+    #         telnet=telnet,
+    #         results_dir=results_dir,
+    #         analysis_duration_in_minutes=args.duration,
+    #         sampling_period_in_seconds=args.sampling_period_in_secs
+    #     )
+    #     return
 
     if args.program == "stations":
         run_info_connected_stations(
-            telnet=telnet,
-            results_dir=results_dir,
+            ssh=ssh,
+            results_dir=args.results_folder,
             analysis_duration_in_minutes=args.duration,
             sampling_period_in_seconds=args.sampling_period_in_secs,
             columns_config_file=args.stations_columns_config,
         )
         return
 
-    if args.program == "antenas":
-        run_tx_rx_stats(
-            telnet=telnet,
-            results_dir=results_dir,
-            analysis_duration_in_minutes=args.duration,
-            sampling_period_in_seconds=args.sampling_period_in_secs,
-            columns_config_file=args.antenas_columns_config,
-        )
-        return
+    # if args.program == "antenas":
+    #     run_tx_rx_stats(
+    #         telnet=telnet,
+    #         results_dir=results_dir,
+    #         analysis_duration_in_minutes=args.duration,
+    #         sampling_period_in_seconds=args.sampling_period_in_secs,
+    #         columns_config_file=args.antenas_columns_config,
+    #     )
+    #     return
 
 
 if __name__ == "__main__":

@@ -119,8 +119,6 @@
                 "10",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sda1",
             ]
         },
         {
@@ -146,8 +144,8 @@
                 "1",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sda1",
+                "-rf",
+                "${workspaceFolder}/wifi_stats/results_test_dir",
                 "-ts",
                 "2022-12-14_12-57",
             ]
@@ -171,8 +169,8 @@
                 "sah",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sda1",
+                "-rf",
+                "${workspaceFolder}/wifi_stats/results_test_dir",
                 "-ts",
                 "2022-12-14_12-57",
             ]
@@ -189,7 +187,7 @@
                 "-n",
                 "livebox_nico_test",
                 "-l",
-                "192.168.1.1",
+                "192.168.144.1",
                 "-u",
                 "root",
                 "-pw",
@@ -201,9 +199,9 @@
                 "-sc",
                 "${workspaceFolder}/wifi_stats/config/stations_info_config.yml",
                 "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sda1",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
+                "-rf",
+                "${workspaceFolder}/wifi_stats/results_test_dir",
                 "-ts",
                 "2022-12-14_12-57",
             ]
@@ -233,8 +231,8 @@
                 "${workspaceFolder}/wifi_stats/config/antenas_tx_rx_config.yml",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rd",
-                "dev-sdb1",
+                "-rf",
+                "${workspaceFolder}/wifi_stats/results_test_dir",
                 "-ts",
                 "2022-12-14_12-57",
             ]
