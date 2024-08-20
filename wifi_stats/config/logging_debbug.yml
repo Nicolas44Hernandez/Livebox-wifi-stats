@@ -1,0 +1,103 @@
+version: 1
+disable_existing_loggers: true
+
+formatters:
+  default:
+    format: "%(asctime)s [%(threadName)s] [%(levelname)s] %(name)s: %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+
+  __main__:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/main.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+root:
+  level: WARN
+  handlers: [console]
+
+loggers:
+  programs.setup.generate_files:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.setup.generate_traffic_config:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.setup.initial_transfer_files_to_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  __main__:
+    level: DEBUG
+    handlers: [__main__]
+    propagate: no
+
+  programs.chanim_stats:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.tx_rx_stats:
+    level: INFO
+    handlers: [console]
+    propagate: no
+
+  programs.files_transfer:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.results.traffic_file_generation:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.results.antenas_througput_file_generation:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.calibration.initial_calibrate_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.calibration.livebox_counters_log:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.info_connected_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.static_data:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.switch_5GHz:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  common.telnet:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  common.ssh:
+    level: DEBUG
+    handlers: [console]
+    propagate: no

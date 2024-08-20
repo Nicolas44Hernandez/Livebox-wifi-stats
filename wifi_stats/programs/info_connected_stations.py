@@ -7,7 +7,7 @@ Retrieve stats from stations connected to the 2.4 GHz and 5 GHz frequency band b
 from datetime import datetime, timedelta
 import logging
 import time
-from common.telnet import Telnet
+from common import Telnet, SshClient
 import yaml
 
 logger = logging.getLogger(__name__)
@@ -17,14 +17,13 @@ RESULTS_FILE_CONNECTIONS_NUMBER = "connections_number.txt"
 RESULTS_FILE_INFO_STATION = "station_"
 
 COMMANDS = {
-    "get header": "echo -e \"connected    2.4GHz    5GHz    datetime\"",
-    "check if 5GHz band is up": "echo -n 'EE''EE '; wl -i wl0 bss; echo 'FF''FF'",
-    "check if 2.4GHz band is up": "echo -n 'EE''EE '; wl -i wl2 bss; echo 'FF''FF'",
-    "get stations MAC list 5GHz": "echo -n 'EE''EE '; wl -i wl0 assoclist | sed 's/assoclist //'; echo 'FF''FF'",
-    "get stations MAC list 2.4GHz": "echo -n 'EE''EE '; wl -i wl2 assoclist | sed 's/assoclist //'; echo 'FF''FF'",
-    "get station info": "echo -n 'EE''EE '; wl -i BAND sta_info MAC_ADDRESS; echo 'FF''FF'",
-    "check if file exists": "echo -n 'EE''EE '; test -f FILE && echo 'exists'; echo 'FF''FF'",
+    "get active stations in BAND": "WiFi.AccessPoint.BAND.AssociatedDevice.*.Active",
+    "get station data": "WiFi.AccessPoint.BAND.AssociatedDevice.INDEX.",
+    "check if band is up": "WiFi.Radio.RADIO.Status",
 }
+
+BANDS = {"2.4GHz":"2", "5GHz": "1"}
+RADIO = {"2.4GHz":"1", "5GHz": "2"}
 
 
 def get_columns(config_file: str):
@@ -191,48 +190,66 @@ def parse_telnet_output(raw_output: str):
     return _splitted_patern[len(_splitted_patern) - 1].split("FFFF")[0].lstrip()
 
 
-def get_connected_stations_in_band(telnet: Telnet, band: str):
+def get_connected_stations_in_band(ssh: SshClient, band: str):
     """Returns the MAC list of stations connected to the band WiFi"""
     # Input check
-    if band not in ["2.4GHz", "5GHz"]:
+    if band not in BANDS:
         return []
 
-    mac_list_result_brut = telnet.send_command_and_read_result(
-        COMMANDS["get stations MAC list " + band])  # @MAC => # connected stations
-    _raw_mac_list = str(parse_telnet_output(mac_list_result_brut))
-    if len(_raw_mac_list) == 0:
-        return []
-    connected_stations = _raw_mac_list.split("\r\n")[:-1]
-    return connected_stations
+    # initialize
+    active_stations = []
+
+    # Get indexes of active stations
+    cmd = COMMANDS["get active stations in BAND"].replace("BAND", BANDS[band])
+    registered_stations = ssh.send_command(cmd=cmd, method= False).split("\n")
+
+    for station in registered_stations:
+        if "Active=1" in station:
+            # Get station index
+            station_idx = int(station.split("AssociatedDevice.")[1].split(".")[0])
+            # Retrieve station data
+            cmd_station_info = COMMANDS["get station data"].replace("BAND", BANDS[band]).replace("INDEX", str(station_idx))
+            station_data = ssh.send_command(cmd=cmd_station_info, method= False).split("\n")
+            # Create station dict
+            station_dict = {}
+            _separator = f"AssociatedDevice.{station_idx}."
+            for line in station_data:
+                if line.endswith(_separator) or "=" not in line:
+                    continue
+                field = line.split(f"AssociatedDevice.{station_idx}.")[1]
+                key, value = field.split("=")
+                key = key.split(".")[-1]
+                station_dict[key] = value
+            # Append to active stations list
+            active_stations.append(station_dict)
+    # Return active stations
+    return active_stations
 
 
-def get_connected_stations(telnet: Telnet):
+# TODO: dont pass ssh client but connection info ?
+def get_connected_stations(ssh: SshClient):
     """Retrive the list of mac addresses of the stations connected to each frequency band"""
     # Get connected stations
     connected_stations_5GHz = []
-    connected_stations_2_4GHz = get_connected_stations_in_band(
-        telnet, "2.4GHz")
+    connected_stations_2_4GHz = get_connected_stations_in_band(ssh, "2.4GHz")
     # check if 5GHz band is up
-    if band_is_up(telnet, "5GHz"):
-        connected_stations_5GHz = get_connected_stations_in_band(
-            telnet, "5GHz")
-    total_connections = len(connected_stations_2_4GHz) + \
-        len(connected_stations_5GHz)
+    if band_is_up(ssh, "5GHz"):
+        connected_stations_5GHz = get_connected_stations_in_band(ssh, "5GHz")
+    total_connections = len(connected_stations_2_4GHz) + len(connected_stations_5GHz)
 
     return total_connections, connected_stations_2_4GHz, connected_stations_5GHz
 
 
-def band_is_up(telnet: Telnet, band: str):
+def band_is_up(ssh: SshClient, band: str):
     """Check if a frequency band is up or down"""
     # Input check
-    if band not in ["2.4GHz", "5GHz"]:
+    if band not in BANDS:
         return False
-    # get band status
-    ret_val_raw = telnet.send_command_and_read_result(
-        COMMANDS["check if " + band + " band is up"])
-    ret_val = str(parse_telnet_output(ret_val_raw))
-    band_is_up = not "down" in ret_val
-    return band_is_up
+
+    cmd = COMMANDS["check if band is up"].replace("RADIO", RADIO[band])
+    raw_status = ssh.send_command(cmd=cmd, method= False)[1:-1]
+    band_status = False if raw_status == "Down" else True
+    return band_status
 
 
 def run_info_connected_stations(

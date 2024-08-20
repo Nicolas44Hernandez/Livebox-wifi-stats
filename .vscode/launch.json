@@ -80,7 +80,7 @@
                 "-sm",
                 "6C:C7:EC:2B:2E:D7",
                 "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
             ]
         },
         {

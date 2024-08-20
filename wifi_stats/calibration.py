@@ -1,14 +1,11 @@
-"""Calibrate wifi stats application"""
+"""Calibrate station for measurement campaign"""
 
 import logging
 from logging.config import dictConfig
 import yaml
 import argparse
-from common import Telnet
+from common import SshClient
 from programs.calibration.initial_calibrate_stations import run_calibrate_station
-
-USB_DEVICE_PATH = "/var/usbmount/kernel::"
-RESULTS_DIR = "wifi_stats_results"
 
 
 logger = logging.getLogger(__name__)
@@ -79,11 +76,10 @@ def main():
     logger.info(f"Running program Calibrate station")
     logger.info(f"args: {args}")
 
-    # Create telnet instance
-    telnet = Telnet(host=args.livebox, login=args.user, password=args.password)
+    # Create ssh interface
+    ssh = SshClient(host=args.livebox, user=args.user, password=args.password)
 
-    run_calibrate_station(
-        telnet=telnet, station_mac=args.station_to_calibrate_mac)
+    run_calibrate_station(ssh=ssh, station_mac=args.station_to_calibrate_mac)
 
 
 if __name__ == "__main__":
