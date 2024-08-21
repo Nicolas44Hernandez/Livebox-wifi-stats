@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import logging
 import time
 import os
-from common import Telnet, SshClient
+from common import SshClient
 import yaml
 
 logger = logging.getLogger(__name__)
