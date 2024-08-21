@@ -26,7 +26,6 @@ def main():
         -pw     --password                 Telnet connection password
         -scf    --stations_config          Config file for stations
         -tcf    --traffic_config           Config file for analysis traffic
-        -ts     --timestamp                Analysis timestamp for results file
         -sc     --stations_columns_config  Config file for the result table in info stations program
         -ac     --antenas_columns_config   Config file for the result table in tx_rx_stats program
         -d      --duration                 Analysis duration in mins
@@ -84,13 +83,6 @@ def main():
         "--traffic_config_file",
         type=str,
         help="Config file for analysis traffic",
-    )
-
-    parser.add_argument(
-        "-ts",
-        "--timestamp",
-        type=str,
-        help="Analysis timestamp for results file",
     )
 
     parser.add_argument(
@@ -169,10 +161,10 @@ def main():
     # Create ssh interface
     ssh = SshClient(host=args.livebox, user=args.user, password=args.password)
 
-    # # Run program
-    # if args.program == "static_livebox_data":
-    #     run_static_data(telnet=telnet, results_dir=results_dir)
-    #     return
+    # Run program
+    if args.program == "static_livebox_data":
+        run_static_data(ssh=ssh, results_dir=args.results_folder)
+        return
 
     # if args.program == "chanim_stats":
     #     run_chanim_stats(

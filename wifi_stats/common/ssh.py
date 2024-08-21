@@ -56,8 +56,15 @@ class SshClient:
             logger.error("Error in SSH connection")
         logger.debug(f"SSH connection closed with host: %s", self.host)
 
-    def send_command(self, cmd: str, method: bool = False) -> str:
+    def send_command(self, cmd: str, method: bool = False, system_cmd: bool=False) -> str:
         """Send command to SSH host"""
+        if system_cmd:
+            if not self.connection:
+                logger.error("SSH connection not stablished")
+                return None
+            result = self.connection.run(cmd, hide=True).stdout
+            return result
+
         try:
             # build ubus-cli command
             intro = "ubus-cli \""
