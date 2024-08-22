@@ -1,6 +1,5 @@
 
 from datetime import datetime
-from logging.config import dictConfig
 import logging
 import os
 import yaml

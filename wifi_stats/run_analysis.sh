@@ -112,7 +112,7 @@ requested_traffic_result_file="analyses_results/$BOX_NAME/$ANALYSIS_TIMESTAMP/re
 traffic_log_file="logs/files_transfer.log"
 antenas_log_file="logs/antenas_tx_rx_stats.log"
 echo Schedule task to Generate result files $requested_traffic_result_file
-echo "python3 results.py -tf $traffic_log_file -af $antenas_log_file -rd $requested_traffic_result_file -sc $STATIONS_CONFIG -lc $LOGGING_CONFIG_FILE" | at now +$GENERATE_REQUESTED_TRAFFIC_FILE_TIME minutes
+echo "python3 results.py -tf $traffic_log_file -rd $requested_traffic_result_file -sc $STATIONS_CONFIG -lc $LOGGING_CONFIG_FILE" | at now +$GENERATE_REQUESTED_TRAFFIC_FILE_TIME minutes
 
 # Move smokeping results to results folder
 echo "sudo systemctl stop apache2 smokeping" | at now +$RESULTS_EXTRACTION_TIME minutes

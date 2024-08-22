@@ -12,26 +12,11 @@
             "console": "integratedTerminal",
             "args": [
                 "-tf",
-                "${workspaceFolder}/wifi_stats/analyses_results/CAMP_4_TEST1/2023-09-27_16-30/logs/files_transfer.log",
-                "-af",
-                "${workspaceFolder}/wifi_stats/analyses_results/CAMP_4_TEST1/2023-09-27_16-30/logs/antenas_tx_rx_stats.log",
+                "${workspaceFolder}/wifi_stats/analyses_results/LB38_CAMP_4_1ST_SC2/2023-10-03_11-52/logs/files_transfer.log",
                 "-rd",
                 "${workspaceFolder}",
                 "-sc",
                 "${workspaceFolder}/wifi_stats/config/stations.yml",
-                "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-            ]
-        },
-        {
-            "name": "REAL TRAFFIC: Plot real traffic",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/real_traffic.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-rd",
-                "${workspaceFolder}/wifi_stats/analyses_results/TEST_CAMP5_PRPL/2024-08-13_11-54/results/analysis_results",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
             ]
@@ -119,33 +104,6 @@
                 "10",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
-            ]
-        },
-        {
-            "name": "RUN ANALYSIS: chanim stats",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/main.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-p",
-                "chanim_stats",
-                "-n",
-                "livebox_nico_test",
-                "-l",
-                "192.168.144.1",
-                "-u",
-                "root",
-                "-pw",
-                "sah",
-                "-d",
-                "2",
-                "-sp",
-                "1",
-                "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-                "-rf",
-                "${workspaceFolder}/wifi_stats/results_test_dir",
             ]
         },
         {
