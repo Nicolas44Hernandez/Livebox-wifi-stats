@@ -6,8 +6,7 @@ from datetime import datetime, timedelta
 import logging
 import time
 from common.ssh import SshClient
-from programs.info_connected_stations import get_connected_stations, parse_telnet_output
-
+from wifi_stats.programs.stations_stats import get_connected_stations
 
 logger = logging.getLogger(__name__)
 

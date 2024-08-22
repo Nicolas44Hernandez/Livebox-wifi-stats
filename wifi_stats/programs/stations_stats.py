@@ -42,7 +42,6 @@ def get_columns(config_file: str):
     return columns
 
 def write_single_station_info(
-    ssh: SshClient,
     columns_conf: str,
     station: dict,
     wifi_band: str,
@@ -87,7 +86,6 @@ def write_single_station_info(
 
 
 def write_stations_info_in_file(
-    ssh: SshClient,
     results_dir: str,
     connections_2_4GHz: int,
     connections_5GHz: int,
@@ -99,7 +97,6 @@ def write_stations_info_in_file(
     # loop over stations connected to 2.4GHz band
     for station in connections_2_4GHz:
         write_single_station_info(
-            ssh=ssh,
             columns_conf=columns_conf,
             station=station,
             wifi_band="2.4GHz",
@@ -109,7 +106,6 @@ def write_stations_info_in_file(
     # loop over stations connected to 5GHZ band
     for station in connections_5GHz:
         write_single_station_info(
-            ssh=ssh,
             columns_conf=columns_conf,
             station=station,
             wifi_band="5GHz",
@@ -119,7 +115,6 @@ def write_stations_info_in_file(
 
 
 def write_nb_connections_in_file(
-    ssh: SshClient,
     results_file: str,
     connections_number: int,
     connections_2_4GHz: int,
@@ -139,11 +134,6 @@ def write_nb_connections_in_file(
             file.write(new_entry)
     except Exception:
         logger.error(f"Error when appending to results file")
-
-def parse_telnet_output(raw_output: str):
-    """Parse the output of the sent command"""
-    _splitted_patern = raw_output.split("EEEE")
-    return _splitted_patern[len(_splitted_patern) - 1].split("FFFF")[0].lstrip()
 
 
 def get_connected_stations_in_band(ssh: SshClient, band: str):
@@ -170,7 +160,7 @@ def get_connected_stations_in_band(ssh: SshClient, band: str):
             station_dict = {}
             _separator = f"AssociatedDevice.{station_idx}."
             for line in station_data:
-                if line.endswith(_separator) or "=" not in line:
+                if line.endswith(_separator) or "=" not in line or "ProbeReqCaps" in line:
                     continue
                 field = line.split(f"AssociatedDevice.{station_idx}.")[1]
                 key, value = field.split("=")
@@ -247,7 +237,6 @@ def run_info_connected_stations(
 
         # Write number of connections in dedicated file
         write_nb_connections_in_file(
-            ssh=ssh,
             results_file=results_file_path,
             connections_number=total_connections,
             connections_2_4GHz=len(connected_stations_2_4GHz),
@@ -255,7 +244,6 @@ def run_info_connected_stations(
         )
         if total_connections > 0:
             write_stations_info_in_file(
-                ssh=ssh,
                 results_dir=results_dir,
                 connections_2_4GHz=connected_stations_2_4GHz,
                 connections_5GHz=connected_stations_5GHz,

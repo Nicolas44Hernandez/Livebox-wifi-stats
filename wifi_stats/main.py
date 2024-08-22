@@ -6,11 +6,10 @@ import yaml
 import os
 import argparse
 from common import SshClient
-from programs.chanim_stats import run_chanim_stats
+from programs.radio_stats import run_radio_stats
 from programs.static_data import run_static_data
-from programs.info_connected_stations import run_info_connected_stations
+from wifi_stats.programs.stations_stats import run_info_connected_stations
 from programs.files_transfer import run_files_transfer
-from programs.tx_rx_stats import run_tx_rx_stats
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ def main():
         -scf    --stations_config          Config file for stations
         -tcf    --traffic_config           Config file for analysis traffic
         -sc     --stations_columns_config  Config file for the result table in info stations program
-        -ac     --antenas_columns_config   Config file for the result table in tx_rx_stats program
+        -rc     --radio_columns_config     Config file for the result table in radio counters program
         -d      --duration                 Analysis duration in mins
         -td     --transfert_duration       Transfert duration in secs
         -sp     --sampling_period_in_secs  Sampling period for information request
@@ -93,10 +92,10 @@ def main():
     )
 
     parser.add_argument(
-        "-ac",
-        "--antenas_columns_config",
+        "-rc",
+        "--radio_columns_config",
         type=str,
-        help="Config file for the result table in tx_rx_stats program",
+        help="Config file for the result table in radio counters program",
     )
 
     parser.add_argument(
@@ -166,15 +165,6 @@ def main():
         run_static_data(ssh=ssh, results_dir=args.results_folder)
         return
 
-    # if args.program == "chanim_stats":
-    #     run_chanim_stats(
-    #         telnet=telnet,
-    #         results_dir=results_dir,
-    #         analysis_duration_in_minutes=args.duration,
-    #         sampling_period_in_seconds=args.sampling_period_in_secs
-    #     )
-    #     return
-
     if args.program == "stations":
         run_info_connected_stations(
             ssh=ssh,
@@ -185,15 +175,15 @@ def main():
         )
         return
 
-    # if args.program == "antenas":
-    #     run_tx_rx_stats(
-    #         telnet=telnet,
-    #         results_dir=results_dir,
-    #         analysis_duration_in_minutes=args.duration,
-    #         sampling_period_in_seconds=args.sampling_period_in_secs,
-    #         columns_config_file=args.antenas_columns_config,
-    #     )
-    #     return
+    if args.program == "livebox_counters":
+        run_radio_stats(
+            ssh=ssh,
+            results_dir=args.results_folder,
+            columns_config_file=args.radio_columns_config,
+            analysis_duration_in_minutes=args.duration,
+            sampling_period_in_seconds=args.sampling_period_in_secs
+        )
+        return
 
 
 if __name__ == "__main__":

@@ -130,6 +130,7 @@ def run_static_data(ssh: SshClient, results_dir:str):
          logger.info(f"{file_path} static data file created")
    except FileExistsError:
       logger.error(f"The file '{file_path}' already exists.")
+      return
 
    # write master stations infos
    write_master_station_infos(file_path)

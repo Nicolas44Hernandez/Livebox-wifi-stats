@@ -28,7 +28,7 @@ echo Traffic config file: $TRAFFIC_CONFIG
 echo Smokeping config file: $SMOKEPING_CONFIG
 echo Logging config file: $LOGGING_CONFIG_FILE
 echo Connected stations results config file: $CONNECTED_STATIONS_RESULTS_CONFIG
-echo Antenas stats results config file: $ANTENAS_RESULTS_CONFIG
+echo Radio counters results config file: $RADIO_COUNTERS_RESULTS_CONFIG
 echo USB results device: $USB_RESULTS_DEVICE
 echo 5GHZ band ON period: $WIFI_5GHZ_BAND_ON_PERIOD_IN_SECS
 echo 5GHZ band OFF period: $WIFI_5GHZ_BAND_OFF_PERIOD_IN_SECS
@@ -78,10 +78,10 @@ python3 main.py -p static_livebox_data -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVE
 echo  Running program: CHANIM STATS
 python3 main.py -p chanim_stats -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS &
 
-echo  Running program: ANTENAS STATS
-python3 main.py -p antenas -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -ac $ANTENAS_RESULTS_CONFIG &
+echo  Running program: RADIO STATS
+python3 main.py -p antenas -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -rc $RADIO_COUNTERS_RESULTS_CONFIG &
 
-echo  Running program: INFO STATIONS STATS
+echo  Running program: STATIONS STATS
 python3 main.py -p stations -n $BOX_NAME -l $LIVEBOX_IP_ADDR -u $LIVEBOX_USER -pw $LIVEBOX_PASSWORD -d $ANALYSIS_DURATION_IN_MINUTES -lc $LOGGING_CONFIG_FILE -rd $USB_RESULTS_DEVICE -sp $SAMPLING_PERIOD_IN_SECS -sc $CONNECTED_STATIONS_RESULTS_CONFIG &
 
 echo  Running program: FILES TRANSFER

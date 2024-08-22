@@ -201,14 +201,14 @@
             ]
         },
         {
-            "name": "RUN ANALYSIS: rx_tx_stats",
+            "name": "RUN ANALYSIS: Radio counters stats",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/main.py",
             "console": "integratedTerminal",
             "args": [
                 "-p",
-                "antenas",
+                "livebox_counters",
                 "-n",
                 "livebox_nico",
                 "-l",
@@ -221,8 +221,8 @@
                 "2",
                 "-sp",
                 "10",
-                "-ac",
-                "${workspaceFolder}/wifi_stats/config/antenas_tx_rx_config.yml",
+                "-rc",
+                "${workspaceFolder}/wifi_stats/config/radio_counters_config.yml",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging.yml",
                 "-rf",
