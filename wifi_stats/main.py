@@ -8,7 +8,7 @@ import argparse
 from common import SshClient
 from programs.radio_stats import run_radio_stats
 from programs.static_data import run_static_data
-from wifi_stats.programs.stations_stats import run_info_connected_stations
+from programs.stations_stats import run_info_connected_stations
 from programs.files_transfer import run_files_transfer
 
 logger = logging.getLogger(__name__)

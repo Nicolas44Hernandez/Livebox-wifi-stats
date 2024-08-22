@@ -127,7 +127,7 @@ def write_nb_connections_in_file(
     date_time = str(datetime.now())
 
     # create entry
-    new_entry = f"{connections_number}    {connections_5GHz}    {connections_2_4GHz}    {date_time}\n"
+    new_entry = f"{connections_number}\t{connections_2_4GHz}\t{connections_5GHz}\t{date_time}\n"
     # Write entry
     try:
         with open(results_file, 'a') as file:
@@ -218,7 +218,7 @@ def run_info_connected_stations(
     try:
         with open(results_file_path, 'x') as file:
             # Write header
-            header = "connected    2.4GHz    5GHz    datetime\n"
+            header = "connected\t2.4GHz\t5GHz\tdatetime\n"
             file.write(header)
             logger.info(f"{results_file_path} results file created")
     except FileExistsError:

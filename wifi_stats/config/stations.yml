@@ -2,7 +2,7 @@
 FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
   - name: GALAXY_6C_C7_EC_2B_2E_D7
-    ip: 192.168.1.13
+    ip: 192.168.144.101
     mac: 6C:C7:EC:2B:2E:D7
     ssh_user: nico
     ssh_password: nico
@@ -11,7 +11,7 @@ STATIONS:
     operative_system: Android
     port: 2233
   - name: HUAWEI_AC_BD_70_27_CA_19
-    ip: 192.168.1.12
+    ip: 192.168.144.102
     mac: AC:BD:70:27:CA:19
     ssh_user: nico
     ssh_password: nico

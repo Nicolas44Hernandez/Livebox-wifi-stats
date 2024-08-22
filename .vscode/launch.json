@@ -5,30 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "GENERATE RESULTS FILES FROM LOGS",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/results.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-tf",
-                "${workspaceFolder}/wifi_stats/analyses_results/LB38_CAMP_4_1ST_SC2/2023-10-03_11-52/logs/files_transfer.log",
-                "-rd",
-                "${workspaceFolder}",
-                "-sc",
-                "${workspaceFolder}/wifi_stats/config/stations.yml",
-                "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-            ]
-        },
-        {
             "name": "SETUP ANALYSIS",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/wifi_stats/setup.py",
             "console": "integratedTerminal",
             "args": [
-                "--generate-files",
+                //"--generate-files",
                 "-sc",
                 "${workspaceFolder}/wifi_stats/config/stations.yml",
                 "-nf", // samples per period
@@ -69,23 +52,6 @@
             ]
         },
         {
-            "name": "LIVEBOX COUNTERTS LOG",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/log_livebox_counters.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-l",
-                "192.168.144.1",
-                "-u",
-                "root",
-                "-pw",
-                "sah",
-                "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-            ]
-        },
-        {
             "name": "RUN ANALYSIS: Files transfer",
             "type": "debugpy",
             "request": "launch",
@@ -101,9 +67,9 @@
                 "-d",
                 "3",
                 "-td",
-                "10",
+                "30",
                 "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
             ]
         },
         {
@@ -182,10 +148,27 @@
                 "-rc",
                 "${workspaceFolder}/wifi_stats/config/radio_counters_config.yml",
                 "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
                 "-rf",
                 "${workspaceFolder}/wifi_stats/results_test_dir",
             ]
-        }
+        },
+        {
+            "name": "GENERATE RESULTS FILES FROM LOGS",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/results.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-tf",
+                "${workspaceFolder}/wifi_stats/analyses_results/LB38_CAMP_4_1ST_SC2/2023-10-03_11-52/logs/files_transfer.log",
+                "-rd",
+                "${workspaceFolder}",
+                "-sc",
+                "${workspaceFolder}/wifi_stats/config/stations.yml",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
+            ]
+        },
     ]
 }
