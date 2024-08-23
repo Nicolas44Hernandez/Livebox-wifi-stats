@@ -141,5 +141,7 @@ def run_static_data(ssh: SshClient, results_dir:str):
    # write stations infos
    write_stations_infos(file_path)
 
+   logger.info("Analysis completed")
+
 
 

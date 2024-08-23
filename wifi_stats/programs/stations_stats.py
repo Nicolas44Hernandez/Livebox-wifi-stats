@@ -254,3 +254,5 @@ def run_info_connected_stations(
         while now < next_sample_at:
             time.sleep(0.1)
             now = datetime.now()
+
+    logger.info("Analysis completed")

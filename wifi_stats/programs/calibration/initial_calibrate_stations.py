@@ -17,7 +17,7 @@ COMMANDS = {
 }
 BANDS = {"2.4GHz":"2", "5GHz": "1"}
 
-VALUES_TO_CALIBRATE = ["SignalStrength", "MACAddress"]
+VALUES_TO_CALIBRATE = ["SignalStrength"]
 
 
 def run_calibrate_station(

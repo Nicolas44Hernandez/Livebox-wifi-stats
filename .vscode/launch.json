@@ -5,6 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "STATIONS CALIBRATION",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/calibration.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-n",
+                "livebox_nico_test",
+                "-l",
+                "192.168.144.1",
+                "-u",
+                "root",
+                "-pw",
+                "sah",
+                "-sm",
+                "6C:C7:EC:2B:2E:D7",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
+            ]
+        },
+        {
             "name": "SETUP ANALYSIS",
             "type": "debugpy",
             "request": "launch",
@@ -26,27 +47,6 @@
                 "${workspaceFolder}/wifi_stats/config/traffic_config_file.yml",
                 "-ti",
                 "${workspaceFolder}/wifi_stats/config/plots/",
-                "-lc",
-                "${workspaceFolder}/wifi_stats/config/logging.yml",
-            ]
-        },
-        {
-            "name": "STATIONS CALIBRATION",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/wifi_stats/calibration.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-n",
-                "livebox_nico_test",
-                "-l",
-                "192.168.144.1",
-                "-u",
-                "root",
-                "-pw",
-                "sah",
-                "-sm",
-                "6C:C7:EC:2B:2E:D7",
                 "-lc",
                 "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
             ]

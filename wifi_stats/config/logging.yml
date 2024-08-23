@@ -38,38 +38,24 @@ handlers:
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
-  results_files_generation:
+  requested_traffic:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/result_files_generation.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/requested_traffic.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
-  info_stations:
+  stations_stats:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/info_stations.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/stations_stats.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
-  chanim_stats:
+  radio_stats:
     class: logging.handlers.RotatingFileHandler
     formatter: default
-    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/chanim_stats.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
-
-  antenas_tx_rx_stats:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/antenas_tx_rx_stats.log
-    maxBytes: 52428800 # 50 Megabytes
-    backupCount: 9
-
-  telnet:
-    class: logging.handlers.RotatingFileHandler
-    formatter: default
-    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/telnet.log
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/radio_stats.log
     maxBytes: 52428800 # 50 Megabytes
     backupCount: 9
 
@@ -78,6 +64,15 @@ root:
   handlers: [console]
 
 loggers:
+  __main__:
+    level: DEBUG
+    handlers: [__main__]
+    propagate: no
+
+  programs.calibration.initial_calibrate_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
 
   programs.setup.generate_files:
     level: DEBUG
@@ -94,49 +89,9 @@ loggers:
     handlers: [setup]
     propagate: no
 
-  __main__:
+  programs.results.requested_traffic:
     level: DEBUG
-    handlers: [__main__]
-    propagate: no
-
-  programs.chanim_stats:
-    level: DEBUG
-    handlers: [chanim_stats]
-    propagate: no
-
-  programs.tx_rx_stats:
-    level: INFO
-    handlers: [antenas_tx_rx_stats]
-    propagate: no
-
-  programs.files_transfer:
-    level: DEBUG
-    handlers: [files_transfer]
-    propagate: no
-
-  programs.results.traffic_file_generation:
-    level: DEBUG
-    handlers: [results_files_generation]
-    propagate: no
-
-  programs.results.antenas_througput_file_generation:
-    level: DEBUG
-    handlers: [results_files_generation]
-    propagate: no
-
-  programs.calibration.initial_calibrate_stations:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.calibration.livebox_counters_log:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.info_connected_stations:
-    level: DEBUG
-    handlers: [info_stations]
+    handlers: [requested_traffic]
     propagate: no
 
   programs.static_data:
@@ -144,7 +99,17 @@ loggers:
     handlers: [static_data]
     propagate: no
 
-  common.telnet:
+  programs.files_transfer:
     level: DEBUG
-    handlers: [telnet]
+    handlers: [files_transfer]
+    propagate: no
+
+  programs.radio_stats:
+    level: DEBUG
+    handlers: [radio_stats]
+    propagate: no
+
+  programs.stations_stats:
+    level: INFO
+    handlers: [stations_stats]
     propagate: no

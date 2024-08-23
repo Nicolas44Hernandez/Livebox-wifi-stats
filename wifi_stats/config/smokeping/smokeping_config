@@ -91,26 +91,22 @@ remark = Welcome to the SmokePing website of SmartLocalNetworks
 menu = Search-Engine
 title = Search Engine
 
-++ GALAXY_6C_C7_EC_2B_2E_D7
+++ PC1_Wigreen_78_AF_08_31_B1_18
 
-menu = GALAXY_6C_C7_EC_2B_2E_D7
-title = GALAXY_6C_C7_EC_2B_2E_D7
-host = 192.168.1.13
+menu = PC1_Wigreen_78_AF_08_31_B1_18
+title = PC1_Wigreen_78_AF_08_31_B1_18
+host = 192.168.144.104
 
 ++ RPI_E4_5F_01_E8_C1_2E
 
 menu = RPI_E4_5F_01_E8_C1_2E
 title = RPI_E4_5F_01_E8_C1_2E
-host = 192.168.1.25
+host = 192.168.144.103
 
-++ PC1_Wigreen_78_AF_08_31_B1_18
+++ GALAXY_6C_C7_EC_2B_2E_D7
 
-menu = PC1_Wigreen_78_AF_08_31_B1_18
-title = PC1_Wigreen_78_AF_08_31_B1_18
-host = 192.168.1.27
+menu = GALAXY_6C_C7_EC_2B_2E_D7
+title = GALAXY_6C_C7_EC_2B_2E_D7
+host = 192.168.144.101
 
-++ HUAWEI_AC_BD_70_27_CA_19
 
-menu = HUAWEI_AC_BD_70_27_CA_19
-title = HUAWEI_AC_BD_70_27_CA_19
-host = 192.168.1.12

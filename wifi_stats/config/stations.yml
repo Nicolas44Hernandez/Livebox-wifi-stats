@@ -1,6 +1,24 @@
 
 FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
 STATIONS:
+  - name: PC1_Wigreen_78_AF_08_31_B1_18
+    ip: 192.168.144.104
+    mac: 78:AF:08:31:B1:18
+    ssh_user: pc1_w
+    ssh_password: Wigreen1234$
+    protocol: scp
+    connection_time: 6
+    operative_system: Windows
+    port: 22
+  - name: RPI_E4_5F_01_E8_C1_2E
+    ip: 192.168.144.103
+    mac: E4:5F:01:E8:C1:2E
+    ssh_user: pi
+    ssh_password: pi
+    protocol: scp
+    connection_time: 6
+    operative_system: Linux
+    port: 22
   - name: GALAXY_6C_C7_EC_2B_2E_D7
     ip: 192.168.144.101
     mac: 6C:C7:EC:2B:2E:D7
@@ -10,30 +28,3 @@ STATIONS:
     connection_time: 6
     operative_system: Android
     port: 2233
-  - name: HUAWEI_AC_BD_70_27_CA_19
-    ip: 192.168.144.102
-    mac: AC:BD:70:27:CA:19
-    ssh_user: nico
-    ssh_password: nico
-    protocol: sftp
-    connection_time: 6
-    operative_system: Android
-    port: 2233
-  # - name: RPI_E4_5F_01_E8_C1_2E
-  #   ip: 192.168.1.25
-  #   mac: E4:5F:01:E8:C1:2E
-  #   ssh_user: pi
-  #   ssh_password: pi
-  #   protocol: scp
-  #   connection_time: 6
-  #   operative_system: Linux
-  #   port: 22
-  # - name: PC1_Wigreen_78_AF_08_31_B1_18
-  #   ip: 192.168.1.27
-  #   mac: 78:AF:08:31:B1:18
-  #   ssh_user: pc1_w
-  #   ssh_password: Wigreen1234$
-  #   protocol: scp
-  #   connection_time: 6
-  #   operative_system: Windows
-  #   port: 22

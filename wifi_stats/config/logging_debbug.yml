@@ -22,6 +22,16 @@ root:
   handlers: [console]
 
 loggers:
+  __main__:
+    level: DEBUG
+    handlers: [__main__]
+    propagate: no
+
+  programs.calibration.initial_calibrate_stations:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   programs.setup.generate_files:
     level: DEBUG
     handlers: [console]
@@ -37,47 +47,7 @@ loggers:
     handlers: [console]
     propagate: no
 
-  __main__:
-    level: DEBUG
-    handlers: [__main__]
-    propagate: no
-
-  programs.chanim_stats:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.tx_rx_stats:
-    level: INFO
-    handlers: [console]
-    propagate: no
-
-  programs.files_transfer:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.results.traffic_file_generation:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.results.antenas_througput_file_generation:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.calibration.initial_calibrate_stations:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.calibration.livebox_counters_log:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
-
-  programs.info_connected_stations:
+  programs.results.requested_traffic:
     level: DEBUG
     handlers: [console]
     propagate: no
@@ -87,12 +57,17 @@ loggers:
     handlers: [console]
     propagate: no
 
-  common.telnet:
+  programs.files_transfer:
     level: DEBUG
     handlers: [console]
     propagate: no
 
-  common.ssh:
+  programs.radio_stats:
     level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  programs.stations_stats:
+    level: INFO
     handlers: [console]
     propagate: no

@@ -275,3 +275,4 @@ def run_radio_stats(
             time.sleep(0.1)
             now = datetime.now()
 
+    logger.info("Analysis completed")
