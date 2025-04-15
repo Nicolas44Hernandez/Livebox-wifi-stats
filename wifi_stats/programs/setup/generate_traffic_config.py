@@ -149,7 +149,7 @@ def generate_random_throughputs_for_stations(
 
             # throughput_for_station = generate_constant_throughputs_sequence_for_period(
             #     total_number_of_elements=number_of_files_to_send_per_period,
-            #     value=1
+            #     value=2
             # )
             #########################################################################
 
