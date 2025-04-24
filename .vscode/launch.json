@@ -52,6 +52,36 @@
             ]
         },
         {
+            "name": "SETUP ANALYSIS MODEL TEST",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/wifi_stats/setup.py",
+            "console": "integratedTerminal",
+            "args": [
+                //"--generate-files",
+                "-sc",
+                "${workspaceFolder}/wifi_stats/config/stations.yml",
+                "-nf", // samples per period
+                "8",
+                "-p", // periods
+                "4",
+                "-sd", // standard deviation
+                //"7", // 1 station
+                //"10", // 2 stations
+                "10", // 3 stations
+                "-ss", // sample size
+                //"10", // 1 station
+                //"12", // 2 stations
+                "12", // 3 stations
+                "-tc",
+                "${workspaceFolder}/wifi_stats/config/traffic_config_file.yml",
+                "-ti",
+                "${workspaceFolder}/wifi_stats/config/plots/",
+                "-lc",
+                "${workspaceFolder}/wifi_stats/config/logging_debbug.yml",
+            ]
+        },
+        {
             "name": "RUN ANALYSIS: Files transfer",
             "type": "debugpy",
             "request": "launch",

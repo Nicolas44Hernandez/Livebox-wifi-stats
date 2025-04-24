@@ -56,6 +56,9 @@ def generate_station_throughputs_sequence_for_period(
 
         # Generate new list
         samples = np.random.normal(loc=mean, scale=sd, size=local_sample_size)
+
+        # TODO: ACTIVATE ONLY FOR MODEL TEST
+        #_list = [round(sample,1) if np.random.choice([True, False], p=[0.7, 0.3]) else 0 for sample in samples]
         _list = [round(sample,1) for sample in samples]
         # Remove negative elements
         new_list = [abs(element) for element in _list]

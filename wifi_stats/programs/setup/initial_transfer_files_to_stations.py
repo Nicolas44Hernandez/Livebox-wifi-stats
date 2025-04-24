@@ -103,7 +103,7 @@ def send_files_to_station(station, files_path: str, directory: str):
             cmd1 = (
                 f"sshpass -p '{ssh_password}' sftp -P {port} -oHostKeyAlgorithms=+ssh-rsa {ssh_usr}@{station_ip}:/files/{directory}/"
             )
-            child = pexpect.spawn(cmd1)
+            child = pexpect.spawn(cmd1, timeout=120)
             child.expect("sftp> ")
             cmd2 = f"put {files_path}/{_file}"
             child.sendline(cmd2)

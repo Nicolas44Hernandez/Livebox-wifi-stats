@@ -10,15 +10,6 @@ STATIONS:
     connection_time: 6
     operative_system: Windows
     port: 22
-  - name: RPI_E4_5F_01_E8_C1_2E
-    ip: 192.168.102.97
-    mac: E4:5F:01:E8:C1:2E
-    ssh_user: pi
-    ssh_password: pi
-    protocol: scp
-    connection_time: 6
-    operative_system: Linux
-    port: 22
   - name: GALAXY_6C_C7_EC_2B_2E_D7
     ip: 192.168.102.99
     mac: 6C:C7:EC:2B:2E:D7
