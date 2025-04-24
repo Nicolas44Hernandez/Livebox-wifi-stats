@@ -1,0 +1,45 @@
+version: 1
+disable_existing_loggers: true
+
+formatters:
+  default:
+    format: "%(asctime)s [%(threadName)s] [%(levelname)s] %(name)s: %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+
+  __main__:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/main.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+
+  files_transfer:
+    class: logging.handlers.RotatingFileHandler
+    formatter: default
+    filename: /home/nico/workspace/Livebox-wifi-stats/wifi_stats/logs/files_transfer.log
+    maxBytes: 52428800 # 50 Megabytes
+    backupCount: 9
+
+
+root:
+  level: WARN
+  handlers: [console]
+
+loggers:
+  __main__:
+    level: DEBUG
+    handlers: [__main__]
+    propagate: no
+
+
+  programs.files_transfer:
+    level: DEBUG
+    handlers: [files_transfer]
+    propagate: no
+
+

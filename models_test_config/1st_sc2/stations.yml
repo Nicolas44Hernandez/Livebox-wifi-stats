@@ -1,0 +1,12 @@
+
+FILES_PATH: /home/nico/workspace/Livebox-wifi-stats/files_to_send/
+STATIONS:
+  - name: PC1_Wigreen_78_AF_08_31_B1_18
+    ip: 192.168.102.98
+    mac: 78:AF:08:31:B1:18
+    ssh_user: pc1_w
+    ssh_password: Wigreen1234$
+    protocol: scp
+    connection_time: 6
+    operative_system: Windows
+    port: 22
